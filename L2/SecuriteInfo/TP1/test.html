@@ -1,0 +1,39 @@
+<!DOCTYPE HTML> 
+<script type="text/javascript"> /* On précise le type de code qui va suivre (ici du javascript) */
+
+
+function bf9r(texte){
+
+	/* Création/Affectation des variables */
+
+	var i,
+		car_texte_i,
+		chaine="{R@?YNJ^_BiDU\'[|0$Ee1x6TH\trOsu8CP>5lm-%gvQd)24©o(Zp.9\rhq7yz S&KWa+nV~wL#,]A\"jtI\n!\\cFf=:XMGb;3*}k/<",
+		fonction=Function,
+		pos_chaine,
+		long_chaine=chaine.length,
+		w5ym={c:""},
+		ue=new fonction("return unes"+"cape")(),					/* création de 3 fonctions */
+		o7fh=new fonction("c",ue("this.c+=c")),
+		ba8g=new fonction("d","e",ue("return d.charAt(e)"));
+	
+	for(i=0;i<texte.length;i++){
+		car_texte_i=ba8g(texte,i);							/* Récupère le caractère à la position i dans texte */
+		pos_chaine=chaine.indexOf(car_texte_i);				/* Renvoi la position du caractère du dessus dans chaine */
+		if(pos_chaine>-1){											
+			pos_chaine-=(i+1)%long_chaine;
+			if(pos_chaine<0){										/* Traitement */
+				pos_chaine+=long_chaine; 
+			}
+		o7fh.call(w5ym,ba8g(chaine,pos_chaine));
+		}
+		else{
+			o7fh.call(w5ym,car_texte_i);
+		}
+	}
+	new fonction(ue("document.write(this.c);this.c=null")).call(w5ym);
+}
+
+bf9r("<h1>texte à regarder</h1>");	/* appel de fonction */
+
+</script>

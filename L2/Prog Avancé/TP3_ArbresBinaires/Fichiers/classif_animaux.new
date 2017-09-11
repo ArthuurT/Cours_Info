@@ -1,0 +1,24 @@
+0 1 11 17 Est-il vert�br� ?
+1 2 3 14 Est-il poilu ?
+2 23 24 20 Est ce uncarnivore ?
+23 -1 -1 13 C'est un lion
+24 -1 -1 17 C'est une vache !
+3 4 5 19 A-t-il des plumes ?
+4 -1 -1 16 C'est un aigle !
+5 6 7 29 A-t-il des �cailles soud�es ?
+6 -1 -1 20 C'est un crocodile !
+7 8 9 28 A-t-il des �cailles libres ?
+8 -1 -1 24 C'est un poisson-clown !
+9 10 -1 20 Est-il à peau nue ?
+10 -1 -1 22 C'est une grenouille !
+11 12 19 21 A-t-il une carapace ?
+12 13 16 36 Son corps a-t-il plus de 2 parties ?
+13 14 15 36 Son corps a-t-il plus de 3 parties ?
+14 -1 -1 19 C'est une abeille !
+15 -1 -1 22 C'est un scolopendre !
+16 17 18 25 A-t-il plus de 8 pattes ?
+17 -1 -1 16 C'est un crabe !
+18 -1 -1 20 C'est une araign�e !
+19 20 21 21 A-t-il une coquille ?
+20 -1 -1 17 C'est une moule !
+21 -1 -1 18 C'est un lombric !

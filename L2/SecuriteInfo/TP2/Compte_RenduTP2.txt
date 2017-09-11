@@ -1,0 +1,14 @@
+TROTTIER ARTHUR L2 SPI
+
+Question 4:
+  (a) k = 0101 1011 et m = 1001 0010 donc c = k XOR m = 1100 1001
+  (b) c = 1100 1001 et k = 0101 1011 donc c XOR k = 1001 0010 = m
+
+      k = 1100 0101 0001 et m = 0010 1111 0110 donc c = k XOR m = 1110 1010 0111
+      c = 1110 1010 0111 et k = 1100 0101 0001 donc c XOR k = 0010 1111 0110 = m
+
+      Ca marche !
+
+Question 5:
+
+  En cours

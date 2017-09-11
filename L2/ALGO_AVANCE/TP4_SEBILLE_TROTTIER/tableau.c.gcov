@@ -1,0 +1,44 @@
+        -:    0:Source:tableau.c
+        -:    0:Graph:tableau.gcno
+        -:    0:Data:tableau.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1://
+        -:    2://  tableau.c
+        -:    3://  
+        -:    4://
+        -:    5://  Created by Claudine Piau-Toffolon on 19/10/2015.
+        -:    6://
+        -:    7://
+        -:    8:
+        -:    9:#include <stdio.h>
+        -:   10:#include <stdlib.h> 
+        -:   11:#include <time.h> 
+        -:   12:#include <string.h>
+        1:   13:void permuter_cases (char *tableau, int i1, int i2, int taille) {
+        -:   14:    char inter;
+        1:   15:    if( (i1 < 0) || (i2 < 0) || (i1 >= taille) || (i2 >= taille)){ printf("impossible d'effectuer la permutation\n");
+        1:   16:        exit(1);
+        -:   17:    }
+    #####:   18:    inter = tableau[i2];
+    #####:   19:    tableau[i2] = tableau[i1];
+    #####:   20:    tableau[i1] = inter;
+    #####:   21:}
+        1:   22:int main(void) {
+        -:   23:    int case1, case2, indice, taille;
+        -:   24:    char phrase[512];
+        -:   25:    time_t nb_secondes;
+        -:   26:    // lecture de la phrase
+        1:   27:    printf("entrez une phrase : "); fgets(phrase, 512, stdin);
+        1:   28:    taille = strlen(phrase);
+        1:   29:    printf("taille de la phrase : %d\n\n", taille);
+        -:   30:    // test aleatoire
+        1:   31:    printf("TEST ALEATOIRE ------------------\n");
+        1:   32:    srand(time(&nb_secondes)); //initialisation du generateur de nb aleatoires
+        1:   33:    for(indice=0; indice < 5; indice++){ // testons 5 fois
+        1:   34:    case1 = (float)rand()/RAND_MAX * (taille+5); // nb alea. entre 0 et taille
+        1:   35:    case2 = (float)rand()/RAND_MAX * (taille+5); // nb alea. entre 0 et taille permuter_cases(phrase, case1, case2, taille);
+        1:   36:    printf("la phrase avec les cases %2d et %2d permutees : %s", case1, case2, phrase); permuter_cases(phrase, case2, case1, taille); // on reprend la phrase d'origine
+        -:   37:    }
+    #####:   38:return 0;
+        -:   39:}

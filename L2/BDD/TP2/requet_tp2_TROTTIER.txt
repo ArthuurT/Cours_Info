@@ -1,0 +1,101 @@
+\PREMIERE VERSION:
+
+CREATE TABLE avion (
+IdAvion int PRIMARY KEY,
+TypeAvion varchar,
+CapaAvion int,
+LocAvion varchar
+);
+
+CREATE TABLE pilote (
+IdPilote int PRIMARY KEY,
+NomPilote varchar,
+VillePilote varchar
+);
+
+CREATE TABLE vol (
+IdVol int PRIMARY KEY,
+IdPilote int REFERENCES PILOTE,
+IdAvion int REFERENCES AVION,
+VilleDep varchar,
+VilleArr varchar,
+HDep varchar,
+HArr varchar
+);
+
+a) SELECT nompilote FROM pilote NATURAL JOIN vol WHERE villedep = 'Paris Orly';
+
+b) SELECT idavion,locavion FROM avion WHERE locavion <> 'Paris Orly' AND capaavion > 200;
+
+c) SELECT nompilote FROM pilote NATURAL JOIN avion NATURAL JOIN vol WHERE typeavion like 'ATR%';
+
+SELECT nompilote FROM pilote WHERE idpilote = any(SELECT idpilote FROM vol WHERE idavion = any(SELECT idavion FROM avion WHERE typeavion like 'ATR%'));
+
+d)SELECT DISTINCT villearr FROM vol NATURAL JOIN avion WHERE villedep LIKE 'Paris%' AND capaavion > any(SELECT capaavion FROM avion WHERE typeavion = 'A300');
+
+e)
+
+f)
+
+DEUXIEME VERSION:
+
+
+CREATE TABLE type (
+Id_type int PRIMARY KEY,
+Nom_type varchar,
+Nb_place int
+);
+
+CREATE TABLE licence_type (
+nom_licence varchar,
+id_type_licence int,
+PRIMARY KEY (nom_licence, id_type_licence),
+FOREIGN KEY (id_type_licence) REFERENCES type (id_type)
+);
+
+CREATE TABLE licence_pilote (
+id_pilote int,
+nom_licence varchar,
+PRIMARY KEY (nom_licence, id_pilote),
+FOREIGN KEY (id_pilote) REFERENCES pilote (idpilote)
+);
+
+CREATE TABLE aeroport (
+id_aeroport int PRIMARY KEY,
+nom_aeroport varchar,
+nom_ville varchar
+);
+
+ALTER TABLE vol
+ADD id_aeroport_dep int REFERENCES aeroport (id_aeroport),
+ADD id_aeroport_arr int REFERENCES aeroport (id_aeroport);
+
+ALTER TABLE avion
+ADD nom_avion varchar,
+ADD id_type_avion int, 
+ADD id_aeroport_avion;
+
+ALTER TABLE pilote
+ADD nom_ville_pilote varchar;
+
+UPDATE vol SET id_aeroport_dep = (SELECT id_aeroport FROM aeroport WHERE aeroport.nom_aeroport = vol.villedep);
+UPDATE vol SET id_aeroport_arr = (SELECT id_aeroport FROM aeroport WHERE aeroport.nom_aeroport = vol.villearr);
+ALTER TABLE vol DROP villedep;
+ALTER TABLE vol DROP villearr;
+
+UPDATE avion SET id_aeroport_avion = (SELECT id_aeroport FROM aeroport WHERE aeroport.nom_aeroport = avion.locavion);
+UPDATE avion SET id_type_avion = (SELECT id_type FROM type WHERE type.nom_type = avion.nom_avion); 
+ALTER TABLE avion DROP capaavion;
+ALTER TABLE avion DROP locavion;
+ALTER TABLE avion DROP nom_avion;
+
+
+3) a-   ALTER TABLE pilote ADD COLUMN sal int DEFAULT 5000
+	UPDATE pilote SET sal = 7500 WHERE idpilote = any(SELECT idpilote FROM vol);
+
+
+   b-	SELECT p1.nompilote ||' - '|| p2.nompilote AS paire FROM pilote AS p1 JOIN pilote as p2 ON p1.villepilote = p2.villepilote AND p1.nompilote < p2.nompilote;
+
+   c-	SELECT nompilote FROM pilote WHERE idpilote in (select idpilote from vol natural join avion where (idpilote, id_type_avion) not in (select idpilote, id_type_licence from licence_pilote natural join licence_type));
+
+   d-	SELECT idavion from avion WHERE idavion in (select idavion from vol natural join pilote WHERE (idpilote, id_type_avion) in (select idpilote, id_type_licence from licence_pilote natural join licence_type));

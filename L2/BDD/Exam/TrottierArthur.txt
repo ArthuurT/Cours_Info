@@ -1,0 +1,79 @@
+Auto-Ecole : le code de la route
+
+1) psql -d etu_coderoute
+
+2)
+CREATE TABLE SERIE (
+  id_cdrom int,
+  id_serie int,
+  commentaire text,
+  PRIMARY KEY (id_cdrom, id_serie),
+  FOREIGN KEY (id_cdrom) REFERENCES cdrom (id_cdrom)
+);
+
+CREATE TABLE COMPO_SERIE (
+  id_cdrom int,
+  id_serie int,
+  num_ordre int,
+  id_question int,
+  PRIMARY KEY (id_cdrom, id_serie, num_ordre),
+  FOREIGN KEY (id_cdrom) REFERENCES cdrom (id_cdrom),
+  FOREIGN KEY (id_question) REFERENCES question (id_question),
+  FOREIGN KEY (id_serie) REFERENCES serie (id_serie)
+);
+
+3)
+
+ALTER TABLE cdrom ADD COLUMN nom_editeur varchar(30);
+UPDATE cdrom SET nom_editeur = (SELECT nom_editeur FROM editeur WHERE cdrom.id_editeur = editeur.id_editeur);
+DROP TABLE editeur;
+ALTER TABLE cdrom DROP id_editeur;
+
+4)
+
+ALTER TABLE exam ADD COLUMN pourcentage_reussite int;
+UPDATE exam SET pourcentage_reussite = ((SELECT COUNT(*) FROM passage WHERE nb_erreurs <= 5 AND exam.id_exam = passage.id_exam) / (SELECT COUNT(*) FROM passage WHERE exam.id_exam = passage.id_exam) * 100)
+
+5)
+
+SELECT nom_e, prenom_e FROM eleve WHERE id_eleve = ANY(SELECT id_eleve FROM passage WHERE nb_erreurs >= 5);
+
+6)
+
+SELECT AVG(nb_erreurs) FROM passage WHERE id_eleve = ANY(SELECT id_eleve FROM eleve WHERE nom_e = 'WESTON' AND prenom_e = 'Alice');
+
+7)
+
+SELECT DISTINCT id_serie, id_cdrom FROM compo_serie WHERE id_question = ANY(SELECT id_question FROM question WHERE difficulte = 'difficile');
+
+8)
+
+SELECT MIN(nb_fautes) FROM entrainement WHERE id_seance = ANY(SELECT id_seance FROM seance WHERE id_serie = ANY(SELECT id_serie FROM compo_serie WHERE id_question = ANY(SELECT id_question FROM question WHERE intitule = 'limitation vitesse')));
+
+9)
+
+SELECT COUNT(*) FROM eleve WHERE nom_e LIKE '%M*' AND id_eleve = ANY(SELECT id_eleve FROM passage WHERE nb_erreurs <= 5 AND id_exam = ANY(SELECT id_exam FROM exam WHERE date_exam BETWEEN current_date - 30 AND current_date));
+
+10)
+
+SELECT intitule FROM question WHERE id_question = ANY(SELECT id_question FROM compo_serie WHERE id_serie = ANY(SELECT id_serie FROM seance WHERE id_seance = ANY(SELECT id_seance FROM entrainement WHERE id_eleve = ANY(SELECT id_eleve FROM eleve WHERE nom_e = 'JONES' and prenom_e = 'Bernard'))));
+
+11)
+
+SELECT nom_e ||' '|| prenom_e AS "candidats potentiels" from eleve WHERE id_eleve = ANY(SELECT id_eleve FROM entrainement WHERE nb_fautes <= 5 AND id_seance = ANY(SELECT MAX(id_seance) FROM entrainement));
+
+12)
+
+INSERT INTO passage VALUES ((SELECT id_eleve FROM eleve WHERE nom_e = 'OBAMA' AND prenom_e = 'Claire'),(SELECT id_exam FROM exam WHERE date_exam > current_date),NULL);
+
+13)
+
+UPDATE passage SET nb_erreurs = 2 WHERE id_eleve = ANY(SELECT id_eleve FROM eleve WHERE nom_e = 'OBAMA' AND prenom_e = 'Claire');
+
+14)
+
+SELECT * FROM eleve WHERE id_eleve = ALL(SELECT id_eleve FROM passage WHERE nb_erreurs < 5) AND id_eleve = ANY(SELECT id_eleve FROM entrainement WHERE id_seance = ANY(SELECT id_seance FROM compo_serie WHERE id_question = ANY(SELECT id_question FROM question WHERE difficulte <> 'difficile')));
+
+15)
+
+UPDATE serie SET commentaire = 'à éviter à cause de la question 6 qui est fausse' WHERE id_serie,id_cdrom = ANY(SELECT id_serie,id_cdrom FROM compo_serie WHERE id_question = 6);

@@ -1,0 +1,77 @@
+ssh info
+psql -l
+psql -d booktown
+booktown => \h
+booktown => \h CREATE USER
+booktown => \?
+psql -d etu_employes
+\!
+
+CREATE TABLE emp (
+idEmp int PRIMARY KEY,
+nEmp varchar,
+metier varchar,
+idMgr int,
+dateEmb date,
+sal float,
+comm int,
+idDep int REFERENCES dep
+);
+
+CREATE TABLE dep (
+idDep int PRIMARY KEY,
+nDep varchar,
+loc varchar
+);
+
+
+CREATE TABLE grille (
+grade int PRIMARY KEY,
+sal_min int,
+sal_max int
+);
+
+a) SELECT * FROM emp WHERE metier IN ('CLERK','SALESMAN','ANALYST');
+
+b) SELECT DISTINCT metier FROM emp;
+
+c) SELECT nemp FROM emp WHERE nemp LIKE '%A%';
+
+d) SELECT nemp FROM emp WHERE nemp LIKE '_A%';
+
+e) SELECT nemp FROM emp WHERE sal > 1100;
+
+f) SELECT AVG(sal) FROM emp WHERE metier ='CLERK';
+
+g) SELECT * FROM emp WHERE comm IS NULL
+
+h) SELECT nemp FROM emp WHERE metier = 'SALESMAN' OR idmgr = '7698';
+ou
+SELECT nemp FROM emp WHERE metier = 'SALESMAN' UNION SELECT nemp FROM emp WHERE idmgr = '7698';
+
+i) SELECT nemp FROM emp WHERE metier = 'SALESMAN' AND idmgr = '7698';
+ou
+SELECT nemp FROM emp WHERE metier = 'SALESMAN' INTERSECT SELECT nemp FROM emp WHERE idmgr = '7698';
+
+j) SELECT nemp FROM emp WHERE metier != 'SALESMAN';
+ou
+SELECT nemp FROM emp WHERE metier <> 'SALESMAN';
+
+k) SELECT * FROM emp WHERE metier ='SALESMAN' AND (comm IS NULL OR comm = 0);
+
+l) SELECT * FROM emp WHERE metier ='MANAGER' OR (metier = 'CLERK' and iddep = 10);
+
+BONUS 1:
+
+a) ALTER TABLE dep ADD COLUMN directeur varchar;
+b) UPDATE dep SET  directeur = 'King' WHERE ndep = 'ACCOUNTING';
+UPDATE dep SET  directeur = 'Ford' WHERE ndep = 'RESEARCH';
+UPDATE dep SET  directeur = 'Blake' WHERE ndep = 'SALES';
+c) SELECT idemp,nemp,iddep FROM emp WHERE metier ='MANAGER';
+d) SELECT idmgr,iddep FROM emp INTERSECT SELECT idemp,iddep FROM emp WHERE metier = 'manager'; 
+
+
+
+
+
+

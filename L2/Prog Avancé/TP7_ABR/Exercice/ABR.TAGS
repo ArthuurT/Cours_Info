@@ -1,0 +1,300 @@
+
+abr.c,671
+noeud_t * abr_racine_lire(4,25
+err_t abr_racine_ecrire(10,114
+int abr_taille_lire(18,234
+err_t abr_taille_incrementer(24,317
+err_t abr_taille_decrementer(31,411
+booleen_t abr_existe(43,523
+booleen_t abr_vide(52,648
+abr_t * abr_creer(65,800
+err_t abr_detruire_bis(93,1618
+err_t abr_detruire(116,2171
+void abr_noeud_afficher(141,2540
+void abr_afficher_bis(153,2806
+void abr_afficher(177,3529
+err_t abr_inserer(206,4005
+booleen_t abr_supprimer(238,4755
+err_t abr_charger(263,5227
+err_t abr_sauver_bis(345,7293
+err_t abr_sauver(386,8308
+noeud_t * abr_pere_rechercher_bis(429,9286
+noeud_t * abr_pere_rechercher(454,9811
+booleen_t abr_rechercher(475,10213
+
+abr.h,427
+#define _ABR_H_2,16
+typedef enum abr_parcours_s 13,110
+typedef enum abr_parcours_s { UNK 13,110
+typedef enum abr_parcours_s { UNK , PREFIXE 13,110
+typedef enum abr_parcours_s { UNK , PREFIXE , POSTFIXE 13,110
+typedef enum abr_parcours_s { UNK , PREFIXE , POSTFIXE , SYMETRIQUE 13,110
+typedef enum abr_parcours_s { UNK , PREFIXE , POSTFIXE , SYMETRIQUE } abr_parcours_t 13,110
+typedef struct abr_s19,230
+} abr_t 26,567
+
+abr_fonctions.c,98
+void abr_ancetres_afficher(8,80
+err_t abr_dicho_creer_bis(29,521
+err_t abr_dicho_creer(69,1320
+
+avl.c,494
+noeud_t * avl_racine_lire(4,25
+err_t avl_racine_ecrire(10,124
+int avl_taille_lire(17,250
+err_t avl_taille_incrementer(23,344
+err_t avl_taille_decrementer(29,448
+booleen_t avl_existe(40,566
+booleen_t avl_vide(46,651
+avl_t * avl_creer(56,753
+err_t avl_detruire(71,1229
+void avl_afficher(82,1335
+err_t avl_inserer(97,1608
+booleen_t avl_supprimer(109,1786
+err_t avl_charger(121,1974
+err_t avl_sauver(141,2801
+noeud_t * avl_pere_rechercher(157,3208
+booleen_t avl_rechercher(170,3423
+
+avl.h,49
+#define _AVL_H_2,16
+typedef abr_t avl_t 19,152
+
+commun.c,53
+void err_print(4,29
+booleen_t OuiNon_saisir(47,942
+
+commun.h,538
+#define _COMMUN_H_2,19
+typedef enum booleen_s 10,152
+typedef enum booleen_s { FAUX 10,152
+typedef enum booleen_s { FAUX , VRAI 10,152
+typedef enum booleen_s { FAUX , VRAI } booleen_t 10,152
+typedef int err_t 13,236
+#define TAILLE 17,276
+#define MAX_STRING 18,294
+#define OK 21,333
+#define ERR_DEB_MEMOIRE 23,347
+#define ERR_SCANF 24,377
+#define ERR_NOM_FICHIER 25,401
+#define ERR_ELEM_UNK 26,430
+#define ERR_LISTE_IND_ELEM 28,457
+#define ERR_LISTE_VIDE 29,491
+#define ERR_LISTE_ELEM 30,520
+#define ERR_ARBRE_NOEUD 32,550
+
+dico_abr.c,79
+void usage(11,159
+static struct option longopts[longopts20,481
+main(28,631
+
+dico_avl.c,79
+void usage(11,149
+static struct option longopts[longopts20,471
+main(28,621
+
+dico_liste.c,79
+void usage(10,132
+static struct option longopts[longopts19,454
+main(27,604
+
+fraction.c,693
+unsigned long int fraction_cpt 9,78
+unsigned long int fraction_comp 12,148
+booleen_t fraction_existe(19,218
+err_t fraction_detruire(32,383
+err_t fraction_detruire_cb(47,639
+err_t fraction_effacer(56,764
+err_t fraction_effacer_cb(71,967
+void fraction_afficher(82,1092
+void fraction_afficher_cb(94,1320
+fraction_t * fraction_creer(104,1458
+int fraction_comparer(136,2243
+int fraction_comparer_cb(153,2699
+err_t fraction_referencer(169,3036
+err_t fraction_referencer_cb(177,3180
+err_t fraction_copier(189,3379
+err_t fraction_copier_cb(211,3840
+err_t fraction_charger(222,4064
+err_t fraction_charger_cb(246,4566
+err_t fraction_sauver(257,4751
+err_t fraction_sauver_cb(269,4993
+
+fraction.h,115
+#define _FRACTION_H_2,21
+typedef struct fraction_s 10,105
+} fraction_t 14,174
+#define fraction_comp_raz(35,400
+
+individu.c,695
+unsigned long int individu_cpt 8,77
+unsigned long int individu_comp 11,147
+booleen_t individu_existe(23,245
+err_t individu_detruire(35,412
+err_t individu_detruire_cb(58,825
+err_t individu_effacer(67,944
+err_t individu_effacer_cb(85,1160
+void individu_afficher(95,1283
+void individu_afficher_cb(107,1498
+individu_t * individu_creer(116,1625
+int individu_comparer(161,3010
+int individu_comparer_cb(176,3400
+err_t individu_referencer(192,3743
+err_t individu_referencer_cb(200,3883
+err_t individu_copier(211,4075
+err_t individu_copier_cb(232,4520
+err_t individu_charger(243,4737
+err_t individu_charger_cb(267,5226
+err_t individu_sauver(279,5413
+err_t individu_sauver_cb(291,5641
+
+individu.h,115
+#define _INDIVIDU_H_2,21
+typedef struct individu_s 10,105
+} individu_t 14,167
+#define individu_comp_raz(36,394
+
+liste.c,535
+unsigned long int liste_cpt 12,127
+int liste_nb_lire(21,225
+void * liste_elem_lire(29,344
+booleen_t liste_existe(46,707
+booleen_t liste_vide(59,865
+err_t liste_elem_ecrire(78,1097
+liste_t * liste_creer(106,1630
+err_t liste_detruire(148,2654
+void liste_afficher(183,3207
+err_t liste_trier(221,3836
+err_t liste_fd_charger(232,4040
+err_t liste_charger(284,5714
+err_t liste_fd_sauver(323,6953
+err_t liste_sauver(354,7693
+booleen_t liste_rechercher(392,8702
+err_t liste_inserer(434,9493
+booleen_t liste_supprimer(511,11099
+
+liste.h,123
+#define _LISTE_H_2,18
+#define LISTE_NULL 6,58
+#define LISTE_ID_NULL 7,82
+typedef struct liste_s9,108
+} liste_t 17,572
+
+mystring.c,878
+unsigned long int string_cpt 8,77
+unsigned long int string_comp 11,145
+int string_taille_lire(24,232
+char * string_string_lire(30,321
+booleen_t string_existe(39,440
+err_t string_detruire(51,596
+err_t string_detruire_cb(67,871
+err_t string_effacer(76,982
+err_t string_effacer_cb(94,1188
+void string_afficher(106,1332
+void string_afficher_cb(118,1543
+void string_printf(126,1683
+void string_printf_cb(136,1827
+string_t * string_creer(145,1944
+int string_comparer(183,2954
+int string_comparer_cb(196,3252
+err_t string_referencer(211,3586
+err_t string_referencer_cb(219,3720
+err_t string_copier(231,3908
+err_t string_copier_cb(251,4309
+err_t string_charger(262,4521
+err_t string_charger_cb(295,5320
+err_t string_fscanf(304,5462
+err_t string_fscanf_cb(330,6060
+err_t string_sauver(342,6234
+err_t string_sauver_cb(363,6672
+string_t * string_saisir(375,6853
+
+mystring.h,109
+#define _MYSTRING_H_2,21
+typedef struct string_s 10,103
+} string_t 14,163
+#define string_comp_raz(35,381
+
+noeud.c,552
+void * noeud_etiquette_lire(6,45
+err_t noeud_etiquette_ecrire(12,142
+noeud_t * noeud_sag_lire(22,371
+err_t noeud_sag_ecrire(28,462
+noeud_t * noeud_sad_lire(37,628
+err_t noeud_sad_ecrire(43,718
+noeud_existe(54,882
+booleen_t noeud_feuille(66,1023
+booleen_t noeud_est_pere(84,1275
+noeud_t * noeud_creer(109,1765
+err_t noeud_detruire(138,2562
+void noeud_afficher(160,2894
+err_t noeud_fd_sauver(174,3112
+void * noeud_max_supprimer(194,3595
+booleen_t noeud_rechercher(229,4414
+err_t noeud_inserer(265,5551
+booleen_t noeud_supprimer(331,7367
+
+noeud.h,71
+#define _NOEUD_H_2,18
+typedef struct noeud_s12,112
+} noeud_t 17,214
+
+test_abr_fonctions.c,36
+#define FICH_TEST 6,69
+main(9,127
+
+test_abr_fractions.c,37
+#define FICH_TEST 7,88
+main(10,146
+
+test_abr_individus.c,37
+#define FICH_TEST 7,88
+main(10,146
+
+test_abr_mystrings.c,37
+#define FICH_TEST 7,88
+main(10,144
+
+test_commun.c,11
+main(4,25
+
+test_fraction.c,35
+#define FICH_TEST 3,23
+main(6,76
+
+test_individu.c,35
+#define FICH_TEST 3,23
+main(6,76
+
+test_liste.c,78
+void usage(9,114
+static struct option longopts[longopts17,376
+main(25,520
+
+test_liste_fractions.c,103
+#define FICH_TEST 7,64
+void usage(10,127
+static struct option longopts[longopts18,389
+main(26,533
+
+test_liste_individus.c,102
+#define FICH_TEST 6,63
+void usage(9,126
+static struct option longopts[longopts17,388
+main(25,532
+
+test_liste_mystrings.c,102
+#define FICH_TEST 6,63
+void usage(9,127
+static struct option longopts[longopts17,389
+main(25,533
+
+test_mystring.c,35
+#define FICH_TEST 4,42
+main(7,95
+
+test_noeud.c,35
+#define FICH_TEST 4,42
+main(7,92
+
+abr_fonctions.h,0

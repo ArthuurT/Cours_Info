@@ -1,0 +1,31 @@
+//Compte-rendu du TD4 d'outils de développement
+//TROTTIER Arthur et SEBILLE Florian
+
+Exercice 1:
+
+1) On a testé 4 cas possible, 2 valeurs négatives (-1,-2), une valeur négative et positive (1,-2), une valeur nulle (0,2) parmi les 2, et 2 valeurs positives (6,3).
+
+2) On a testé 3 cas possible, des valeurs négatives (-1,-2), une valeur nulle (0), et plusieurs valeurs positives (1,2,25,50).
+
+Conclusion: La valeur entré doit être un entier strictement positif et inférieur ou égale à 25.
+
+Exercice 2:
+
+Les tests sont corrects mais ne couvrent que 5 cas. Pour couvrir plus de tests, il nous faut écrire dans le main chaque test (cas par cas) et écrire les résultats de chaque cas dans la fonction factorielle.
+
+Cepandant cela ne reste pas très optimisé tant que l'on n'aura pas écrit la formule factorielle et long si l'on veut tester un grand nombre de valeurs.
+
+Exercice 3:
+
+Lors de l'affichage, tous les nombres différents de 1 sont à 0 (y compris certains 1).
+
+Il y a un problème dans la fonction afficher_une_case, les deux arguments sont inversés, le nombre de ligne qui est i (c comme argument) doit se situer au numérateur:
+
+int calculer_une_case (int c, int l)
+{
+    return (fact(c) / (fact(l) * fact(c - l)));
+}
+
+Le problème ne venait pas de la fonction fac qui renvoyait pour chaque factorielle souhaitée le bon résultat (test exercice 2), cela ne pouvait donc venir que de l'autre fonction.
+
+
