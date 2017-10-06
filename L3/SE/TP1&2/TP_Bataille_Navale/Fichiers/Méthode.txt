@@ -1,0 +1,23 @@
+
+INITIALISATION
+
+1. Poser un verrou sur la mer
+2. Poser le bateau sur la mer
+3. Debloquer le verrou precedent
+
+PARTIE
+
+Mise en place du verrou bouclier sur bateau
+
+Tant que le bateau n'est pas touché/coulé {
+
+      Deplacement(random) --> gestion des verrous positions voisines + MAJ verrou bouclier (-5%)
+
+      Tir --> recherche de cible + tir
+
+      Sleep(random)
+
+}
+
+
+NOTES : MODIFIER TAILLES VERROUS

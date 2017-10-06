@@ -58,20 +58,22 @@ main( int nb_arg , char * tab_arg[] )
   /* Initialisation de la generation des nombres pseudo-aleatoires */
   srandom((unsigned int)getpid());
 
-  printf( "\n\n%s : ----- Debut du bateau %c (%d) -----\n\n ",
+  printf( "\n\n%s : ----- Debut du bateau %c (%d) -----\n\n",
 	  nomprog , marque , getpid() );
 
-  /* Création d'un bateau */
 
+    /*****************
+    *  INITALISATION *
+    ******************/
 
-
+  printf("\n\n****** INITALISATION ******\n\n");
 
 
   /* Creation verrou sur mer pour pose du bateau */
 
-  sprintf(VerrouPosition,"VerrouPosition_%s",fich_mer);
+  fd1 = open(fich_mer, O_RDONLY);
 
-  fd1 = open(fich_mer, O_RDONLY, 0666);
+  sprintf(VerrouPosition,"VerrouPosition_%s",fich_mer);
 
   verrouPosition.l_type = F_WRLCK;
   verrouPosition.l_whence = 0;
@@ -79,45 +81,54 @@ main( int nb_arg , char * tab_arg[] )
   verrouPosition.l_len = 10;
 
   fcntl(fd1,F_SETLKW,verrouPosition);
-  close(fd1);
 
-  printf("Pose du verrou Position réussi");
+  printf("Pose du verrou Position --> SUCCESS\n");
 
   /* Pose du bateau sur la mer */
 
-  mer_bateau_initialiser();
+  if(mer_bateau_initialiser(fd1,bateau_new(coords_new(), marque, getpid())) == 0){
+    printf("Pose du bateau sur la mer --> SUCCESS\n");
+  }else{
+    printf("Pose du bateau sur la mer --> FAILURE\n");
+    exit(1);
+  }
 
   /* Destruction du verrou après que le bateau soit posé */
 
-  verrou.l_type = F_UNLCK;
+  verrouPosition.l_type = F_UNLCK;
 
-  fcntl(fd1,F_SETLKW,verrou);
+  fcntl(fd1,F_SETLKW,verrouPosition);
+
+  close(fd1);
+
+
+
+    /**********
+    *  PARTIE *
+    **********/
+
+  printf("\n\n****** DEBUT DE PARTIE ******\n\n");
+
 
   /* Creation d'un verrou sur un bateau (bouclier/energie) */
 
-  if(energie > BATEAU_MAX_ENERGIE){
-
     sprintf(VerrouBouclier,"VerrouBouclier_%s",fich_mer);
 
-    fd1 = open(fich_mer, O_RDONLY, 0666);
+    fd1 = open(fich_mer, O_RDONLY);
 
     verrouBouclier.l_type = F_WRLCK;
     verrouBouclier.l_whence = 0;
     verrouBouclier.l_start = 0;
     verrouBouclier.l_len = 10;
 
-    if(fcntl(fd1,F_SETLK,verrouBouclier) == -1) printf("Pose du verrou Bouclier impossible");
+    fcntl(fd1,F_SETLKW,verrouBouclier);
     close(fd1);
 
-    printf("Pose du verrou Bouclier réussi");
-
-  }
-
-  printf("Pose du verrou Bouclier impossible -> energie non suffisante");
+    printf("Pose du verrou Bouclier --> SUCCESS");
 
 
 
-
+/************************************/
 
 
 
