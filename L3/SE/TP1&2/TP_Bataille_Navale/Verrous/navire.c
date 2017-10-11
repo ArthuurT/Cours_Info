@@ -20,6 +20,13 @@ main( int nb_arg , char * tab_arg[] )
   case_t marque = MER_CASE_LIBRE ;
   char nomprog[128] ;
   float energie = 0.0 ;
+  int rowmer;
+  int colmer;
+  off_t taillemer;
+  bateau_t * bateau;
+  off_t offset;
+  int taille_bateau;
+
 
   /* variables utilisation verrou */
 
@@ -58,66 +65,90 @@ main( int nb_arg , char * tab_arg[] )
   /* Initialisation de la generation des nombres pseudo-aleatoires */
   srandom((unsigned int)getpid());
 
-  printf( "\n\n%s : ----- Debut du bateau %c (%d) -----\n\n ",
+  printf( "\n\n%s : ----- Debut du bateau %c (%d) -----\n\n",
 	  nomprog , marque , getpid() );
 
-  /* Création d'un bateau */
 
+    /*****************
+    *  INITALISATION *
+    ******************/
 
-
+  printf("\n\n****** INITALISATION ******\n\n");
 
 
   /* Creation verrou sur mer pour pose du bateau */
 
+  fd1 = open(fich_mer, O_RDONLY);
+
   sprintf(VerrouPosition,"VerrouPosition_%s",fich_mer);
 
-  fd1 = open(fich_mer, O_RDONLY, 0666);
+  mer_dim_lire(fd1,&rowmer,&colmer);
+
+  mer_lc2pos(fd1,rowmer,colmer,&taillemer);
 
   verrouPosition.l_type = F_WRLCK;
   verrouPosition.l_whence = 0;
   verrouPosition.l_start = 0;
-  verrouPosition.l_len = 10;
+  verrouPosition.l_len = taillemer;
 
   fcntl(fd1,F_SETLKW,verrouPosition);
-  close(fd1);
 
-  printf("Pose du verrou Position réussi");
+  printf("Pose du verrou Position --> SUCCESS\n");
 
   /* Pose du bateau sur la mer */
 
-  mer_bateau_initialiser();
+  bateau = bateau_new(coords_new(), marque, getpid());
+
+  if(mer_bateau_initialiser(fd1,bateau) == 0){
+    printf("Pose du bateau sur la mer --> SUCCESS\n");
+  }else{
+    printf("Pose du bateau sur la mer --> FAILURE\n");
+    exit(1);
+  }
+
+  coords_printf(bateau->corps);
 
   /* Destruction du verrou après que le bateau soit posé */
 
-  verrou.l_type = F_UNLCK;
+  verrouPosition.l_type = F_UNLCK;
 
-  fcntl(fd1,F_SETLKW,verrou);
+  fcntl(fd1,F_SETLKW,verrouPosition);
+
+  close(fd1);
+
+
+
+    /**********
+    *  PARTIE *
+    **********/
+
+  printf("\n\n****** DEBUT DE PARTIE ******\n\n");
+
 
   /* Creation d'un verrou sur un bateau (bouclier/energie) */
 
-  if(energie > BATEAU_MAX_ENERGIE){
-
     sprintf(VerrouBouclier,"VerrouBouclier_%s",fich_mer);
 
-    fd1 = open(fich_mer, O_RDONLY, 0666);
+    fd1 = open(fich_mer, O_RDONLY);
+
+    coord_position_get(coords_coord_get(bateau->corps,1));
+    offset = coord_position_get(coords_coord_get(bateau->corps,1));
+    taille_bateau = coords_nb_get(bateau->corps); /* A MODIFIER SI BATEAU EN COLONNE */
+    lseek(fd1,offset,SEEK_SET);
 
     verrouBouclier.l_type = F_WRLCK;
-    verrouBouclier.l_whence = 0;
+    verrouBouclier.l_whence = 1;
     verrouBouclier.l_start = 0;
-    verrouBouclier.l_len = 10;
+    verrouBouclier.l_len = taille_bateau;
 
-    if(fcntl(fd1,F_SETLK,verrouBouclier) == -1) printf("Pose du verrou Bouclier impossible");
+    fcntl(fd1,F_SETLKW,verrouBouclier);
     close(fd1);
 
-    printf("Pose du verrou Bouclier réussi");
-
-  }
-
-  printf("Pose du verrou Bouclier impossible -> energie non suffisante");
+    printf("Pose du verrou Bouclier --> SUCCESS");
 
 
 
-
+/************************************/
 
 
 
