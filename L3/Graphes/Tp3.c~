@@ -72,7 +72,7 @@ void Tp3TESTER(int iTest){
 	Appel0(sC2("Tp3TESTER,test n°",sEnt(iTest)));
 		switch (iTest) {
 		case 1: //calcul de la densité d'un graphe simple aléatoire
-			TP3Facturer(1,5,7,7,7);
+			TP3Facturer(8,3,7,7,7);
 			
 		default: ;
 	}

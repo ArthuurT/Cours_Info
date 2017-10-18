@@ -36,7 +36,6 @@ int bLettrE2(char *sTexte,int *pnCodeCaractereRg0);
 void MallocGereR(char *sMalloc);//technique,gère les malloc et les free des chaînes de caractères
 void PremierAmorceR();
 int bVoyellE2(char *sTexte,int *pnCodeCaractereRg0);
-int CLK_TCK = 100;
 
 void t(char *sTexte){
 	assert(sTexte!=0);
@@ -789,12 +788,12 @@ int nChrono(int bDemarrer){
 	//pr chronométrer une exécution,l'encadrer avec nT=nChrono(kV) et nT=nChrono(kF); nT final donne la durée de l'exécution.
 	static int bChronoDemarrer=kF;
 	static long zChronoDemarrer;
-	Assert1("nChrono",CLK_TCK==100);//curieux
+	Assert1("nChrono",100==100);//curieux
 	FlipFlop("nChrono",bDemarrer,&bChronoDemarrer);
 	int nChrono=0;
 	if (bDemarrer)
 		zChronoDemarrer=clock();
-	else nChrono=(clock()-zChronoDemarrer)/CLK_TCK;//convertit en unité inconnue la durée au numérateur.
+	else nChrono=(clock()-zChronoDemarrer)/100;//convertit en unité inconnue la durée au numérateur.
 	return(nChrono);
 }//nChrono
 

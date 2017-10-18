@@ -81,36 +81,6 @@ void DistancierCalculeR(graf *pgSimple,int bAfficher){//(O(S3)
 
 }//DistancierCalculeR
 
-void GrapheAllouerInitialiseR(int nGraphe,int bAfficher,graf **ppgSimple){
-	//alloue et décrit dans ppgSimple le graphe de rang1 nGraphe
-	//pour simplifier la saisie,les sommets vont de A à Z puis de a à z et les données sont supposées être des entiers dans [0..9] 
-    char ksGros[]="AB1AD1AE2BC3BG2CJ2CK1DM1DN2EF2EQ1FG2FR1GS1HI2HT1IJ1IV1JX3KY2LM2LZ1Ma1NO1Nb3OP2Oc3Pe1Qe2Qf2Rf2Rg2ST2Sg2TU2UV1Uh3VW2WX1Yj1Zj2ab2ak3bm1cd1cm2de2dn2fn1go1hi2ip1kl1lm2ln2op2Aq5Br5Cs5Dt5";
-	char kcMoyen[]="AB2AH1BC1BK2CD2DE1DM2EF2FG1FO2GH2HI2IJ2IP1JK1JQ2KL2LM1LS2MN2NO1NU2OP2PU2QR5RU1ST5TU1AV2CW2EX2GY2";
-	char ksPetit[]="AE2BE3EF1FC2FD3GA8GB8CH9DH9";
-	char *sGrapheType="ksPetit,kcMoyen,ksGros";
-	Appel0("GrapheAllouerInitialiseR");
-		switch(nGraphe){//NB ci-dessous,GrapheGenerer alloue puis initialise ppgSimple
-			case 1:	GrapheGenerer(ksPetit,ppgSimple);
-					break;
-			case 2:	GrapheGenerer(kcMoyen,ppgSimple);
-					break;
-			case 3:	GrapheGenerer(ksGros,ppgSimple);
-					break;
-			default: Assert1("GrapheAllouerInitialiseR default",0);
-		}//switch
-		GrapheVoir0(*ppgSimple,sC2b("Graphe",sG(sItem(sGrapheType,nGraphe))),grCouleur);
-		Assert1("GrapheAllouerInitialiseR",bGrapheSimple(*ppgSimple));
-	Appel1("GrapheAllouerInitialiseR");
-}//GrapheAllouerInitialiseR
-
-void PerformanceCompareR(){
-}//PerformanceCompareR
-
-void Tp1AMORCER(){
-	//amorce le présent module une fois pour toutes
-	bTp1AmorceR=kV;
-}//Tp1AMORCER
-
 void Tp1Distancier(graf *pgG,int bAfficher){
 //calculer le distancier de pgG supposé peu dense (algo de Dijkstra sans tas)
 	
@@ -145,6 +115,39 @@ void Tp1Distancier(graf *pgG,int bAfficher){
 	
 
 }//Tp1Distancier
+
+
+void GrapheAllouerInitialiseR(int nGraphe,int bAfficher,graf **ppgSimple){
+	//alloue et décrit dans ppgSimple le graphe de rang1 nGraphe
+	//pour simplifier la saisie,les sommets vont de A à Z puis de a à z et les données sont supposées être des entiers dans [0..9] 
+    char ksGros[]="AB1AD1AE2BC3BG2CJ2CK1DM1DN2EF2EQ1FG2FR1GS1HI2HT1IJ1IV1JX3KY2LM2LZ1Ma1NO1Nb3OP2Oc3Pe1Qe2Qf2Rf2Rg2ST2Sg2TU2UV1Uh3VW2WX1Yj1Zj2ab2ak3bm1cd1cm2de2dn2fn1go1hi2ip1kl1lm2ln2op2Aq5Br5Cs5Dt5";
+	char kcMoyen[]="AB2AH1BC1BK2CD2DE1DM2EF2FG1FO2GH2HI2IJ2IP1JK1JQ2KL2LM1LS2MN2NO1NU2OP2PU2QR5RU1ST5TU1AV2CW2EX2GY2";
+	char ksPetit[]="AE2BE3EF1FC2FD3GA8GB8CH9DH9";
+	char *sGrapheType="ksPetit,kcMoyen,ksGros";
+	Appel0("GrapheAllouerInitialiseR");
+		switch(nGraphe){//NB ci-dessous,GrapheGenerer alloue puis initialise ppgSimple
+			case 1:	GrapheGenerer(ksPetit,ppgSimple);
+					break;
+			case 2:	GrapheGenerer(kcMoyen,ppgSimple);
+					break;
+			case 3:	GrapheGenerer(ksGros,ppgSimple);
+					break;
+			default: Assert1("GrapheAllouerInitialiseR default",0);
+		}//switch
+		GrapheVoir0(*ppgSimple,sC2b("Graphe",sG(sItem(sGrapheType,nGraphe))),grCouleur);
+		Assert1("GrapheAllouerInitialiseR",bGrapheSimple(*ppgSimple));
+	Appel1("GrapheAllouerInitialiseR");
+}//GrapheAllouerInitialiseR
+
+void PerformanceCompareR(){
+}//PerformanceCompareR
+
+void Tp1AMORCER(){
+	//amorce le présent module une fois pour toutes
+	bTp1AmorceR=kV;
+}//Tp1AMORCER
+
+	
 
 void Tp1INITIALISER(){//O(?)
 	//relance le présent module
