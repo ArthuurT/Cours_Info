@@ -9,6 +9,36 @@
 #include <bateau.h>
 #include <mer.h>
 
+
+void PoseVerrouBateau(int fd1, bateau_t * bateau, int mode){
+
+  int taille_bateau;
+  off_t offset;
+  int i;
+  struct flock verrouBouclier;
+
+  taille_bateau = coords_nb_get(bateau->corps);
+
+  for(i = 0; i < taille_bateau; i++){      /* Pour chaque cellule du bateau */
+
+    offset = coord_position_get(coords_coord_get(bateau->corps,i));
+    lseek(fd1,offset,SEEK_SET);
+
+    verrouBouclier.l_type = mode;
+    verrouBouclier.l_whence = SEEK_CUR;
+    verrouBouclier.l_start = 0;
+    verrouBouclier.l_len = 1;
+
+    fcntl(fd1,F_SETLKW,verrouBouclier);
+
+  }
+
+  if(mode == 0 || mode == 1) printf("\nPose du verrou Bouclier --> SUCCESS\n");
+  else printf("Desactivation du verrou Bouclier --> SUCESS");
+
+}
+
+
 /*
  *  Programme principal
  */
@@ -24,16 +54,19 @@ main( int nb_arg , char * tab_arg[] )
   int colmer;
   off_t taillemer;
   bateau_t * bateau;
-  off_t offset;
-  int taille_bateau;
+  booleen_t touche = FAUX;
+  boolen_t cible;
+  int nb_touche = 0;
+  int nb_tourjeu = 0;
+  int cpt_bateau;
+  coord_t coordcible;
+
+
 
 
   /* variables utilisation verrou */
 
   int fd1;
-  char VerrouPosition[128];
-  char VerrouBouclier[128];
-  struct flock verrouBouclier;
   struct flock verrouPosition;
 
   /* variables création bateau */
@@ -78,31 +111,33 @@ main( int nb_arg , char * tab_arg[] )
 
   /* Creation verrou sur mer pour pose du bateau */
 
-  fd1 = open(fich_mer, O_RDONLY);
-
-  sprintf(VerrouPosition,"VerrouPosition_%s",fich_mer);
+  fd1 = open(fich_mer, O_RDWR);
 
   mer_dim_lire(fd1,&rowmer,&colmer);
 
   mer_lc2pos(fd1,rowmer,colmer,&taillemer);
 
   verrouPosition.l_type = F_WRLCK;
-  verrouPosition.l_whence = 0;
+  verrouPosition.l_whence = SEEK_SET;
   verrouPosition.l_start = 0;
   verrouPosition.l_len = taillemer;
 
   fcntl(fd1,F_SETLKW,verrouPosition);
 
-  printf("Pose du verrou Position --> SUCCESS\n");
+  printf("\nPose du verrou Position --> SUCCESS\n");
 
   /* Pose du bateau sur la mer */
 
   bateau = bateau_new(coords_new(), marque, getpid());
 
+  mer_nb_bateaux_lire(fd1,&cpt_bateau);
+  cpt_bateau++;
+  mer_nb_bateaux_ecrire(fd1,cpt_bateau);
+
   if(mer_bateau_initialiser(fd1,bateau) == 0){
-    printf("Pose du bateau sur la mer --> SUCCESS\n");
+    printf("\nPose du bateau sur la mer --> SUCCESS\n\n");
   }else{
-    printf("Pose du bateau sur la mer --> FAILURE\n");
+    printf("\nPose du bateau sur la mer --> FAILURE\n\n");
     exit(1);
   }
 
@@ -111,11 +146,7 @@ main( int nb_arg , char * tab_arg[] )
   /* Destruction du verrou après que le bateau soit posé */
 
   verrouPosition.l_type = F_UNLCK;
-
   fcntl(fd1,F_SETLKW,verrouPosition);
-
-  close(fd1);
-
 
 
     /**********
@@ -127,33 +158,93 @@ main( int nb_arg , char * tab_arg[] )
 
   /* Creation d'un verrou sur un bateau (bouclier/energie) */
 
-    sprintf(VerrouBouclier,"VerrouBouclier_%s",fich_mer);
+  PoseVerrouBateau(fd1,bateau,1); // mode = 1 -> WRLCK
 
-    fd1 = open(fich_mer, O_RDONLY);
+  /* BOUCLE DE JEU */
 
-    coord_position_get(coords_coord_get(bateau->corps,1));
-    offset = coord_position_get(coords_coord_get(bateau->corps,1));
-    taille_bateau = coords_nb_get(bateau->corps); /* A MODIFIER SI BATEAU EN COLONNE */
-    lseek(fd1,offset,SEEK_SET);
+  do{
 
-    verrouBouclier.l_type = F_WRLCK;
-    verrouBouclier.l_whence = 1;
-    verrouBouclier.l_start = 0;
-    verrouBouclier.l_len = taille_bateau;
+    printf("\n// Tour de jeu n°%i \\\\ \n",nb_tourjeu);
 
-    fcntl(fd1,F_SETLKW,verrouBouclier);
-    close(fd1);
+    /* Desactivation du verrou bouclier si touché 1ère fois / mort si 2ème fois */
 
-    printf("Pose du verrou Bouclier --> SUCCESS");
+    mer_bateau_est_touche(fd1,bateau,&touche);
+
+    if(touche == VRAI && nb_touche == 0){
+
+      printf("\nBateau touché -> plus de bouclier\n");
+      nb_touche++;
+      touche = FAUX;
+      PoseVerrouBateau(fd1,bateau,2); //mode = 2 -> UNLCK
+
+    }else if(touche == VRAI && nb_touche == 1){
+
+      printf("\nBateau touché -> coulé\n");
+      mer_bateau_couler(fd1,bateau);
+
+      mer_nb_bateaux_lire(fd1,&cpt_bateau);
+      cpt_bateau--;
+      mer_nb_bateaux_ecrire(fd1,cpt_bateau);
+
+      printf( "\n\n%s : ----- Fin du navire %c (%d) -----\n\n ",
+    	  nomprog , marque , getpid() );
+      exit(0);
+
+    }else{
+      printf("\nBateau non-touché\n");
+    }
+
+
+    /* Phase de tir */
+
+    printf("\nDebut de la phase de tir\n");
+
+    mer_bateau_cible_acquerir(fd1,bateau,cible,coordcible);
+
+    if(cible == FAUX){
+      printf("Pas de cible trouvé\n");
+    }else{
+      printf("Cible trouvé\n");
+
+      mer_bateau_cible_tirer(fd1,coordcible);
+
+      printf("Tir effectué\n");
+    }
+
+    printf("\nFin de la phase de tir\n");
+
+    sleep(5);
+
+    /* Phase de déplacement */
+
+    printf("\nDebut de la phase de déplacement\n");
+
+      
 
 
 
-/************************************/
 
 
 
-  printf( "\n\n%s : ----- Fin du navire %c (%d) -----\n\n ",
-	  nomprog , marque , getpid() );
 
-  exit(0);
+    printf("\nFin de la phase de déplacement\n");
+
+    sleep(5);
+
+    nb_tourjeu++;
+
+    mer_nb_bateaux_lire(fd1,&cpt_bateau);
+
+    printf("\nNombre de bateau restant sur la mer: %i\n",cpt_bateau);
+
+  }while(cpt_bateau > 1);
+
+
+  printf("\n\nPlus de bateau sur la mer\nNavire %c vainqueur\n\n",marque);
+
+  printf("****** FIN DE PARTIE ******");
+
+  close(fd1);
+  exit(1);
+
 }

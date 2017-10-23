@@ -8,8 +8,8 @@
 #include <mer.h>
 
 
-/* 
- * Affichage d'une case/cellule de la mer 
+/*
+ * Affichage d'une case/cellule de la mer
  */
 
 extern
@@ -19,60 +19,60 @@ mer_case_printf( case_t cellule )
      printf( "%c" , cellule );
 }
 
-/* 
+/*
  * Affichage de la mer
  */
 
-extern 
+extern
 int
 mer_afficher( const int fd )
 {
-     
-     int nb_lig = 0 ; 
+
+     int nb_lig = 0 ;
      int nb_col = 0 ;
-     int nb_bateaux = 0 ; 
+     int nb_bateaux = 0 ;
      char cellule = MER_CASE_LIBRE ;
-     int l,c ; 
+     int l,c ;
      char mess[MESS_LONGUEUR];
 
      /*----------*/
 
-     /* 
-      * Lecture des dimensions de la mer 
+     /*
+      * Lecture des dimensions de la mer
       */
 
      mer_dim_lire( fd, &nb_lig, &nb_col );
 
-     /* 
-      * Positionnement debut mer 
+     /*
+      * Positionnement debut mer
       */
 
      if( lseek( fd , MER_DEBUT_NB_BATEAUX , SEEK_SET ) == -1 )
      {
-	  sprintf( mess , "mer_afficher : Pb lseek positionnement debut fichier mer (fd=%d)\n" , 
+	  sprintf( mess , "mer_afficher : Pb lseek positionnement debut fichier mer (fd=%d)\n" ,
 		   fd );
 	  perror(mess);
 	  return(ERREUR) ;
      }
-     
+
      if( read( fd , &nb_bateaux , sizeof(int)) == -1 )
        {
 	 sprintf( mess , "mer_afficher : erreur sur lecture nb_bateaux\n");
 	 perror(mess);
 	 return(ERREUR) ;
        }
-#ifdef _DEBUG_ 
-     printf("mer_afficher --> affichage de la mer [%d,%d]\n", 
+#ifdef _DEBUG_
+     printf("mer_afficher --> affichage de la mer [%d,%d]\n",
 	    nb_lig , nb_col );
 #endif
 
-     /* 
+     /*
       * Affichage du nombre de bateaux
       */
 
-     fprintf( stdout , "    Nb bateaux = %d\n" , nb_bateaux ) ; 
+     fprintf( stdout , "    Nb bateaux = %d\n" , nb_bateaux ) ;
 
-     /* 
+     /*
       * Affichage de l'aire de jeu
       */
 
@@ -96,7 +96,7 @@ mer_afficher( const int fd )
 	       mer_case_printf(  cellule );
 	       fprintf( stdout , " " );
 	  }
-	  
+
 	  fprintf(stdout , "|\n");
 	  fprintf( stdout , "----" ) ; for( c=0 ; c<nb_col ; c++ ) fprintf( stdout , "|---" ); fprintf(stdout , "|\n");
      }
@@ -107,14 +107,14 @@ mer_afficher( const int fd )
      return(CORRECT);
 }
 
-/* 
+/*
  * Initialisation du fichier de la mer
  */
 
-extern 
-int 
-mer_initialiser( const char * fich_mer , 
-		 const int nb_lig , 
+extern
+int
+mer_initialiser( const char * fich_mer ,
+		 const int nb_lig ,
 		 const int nb_col )
 {
      int fd ;
@@ -125,12 +125,12 @@ mer_initialiser( const char * fich_mer ,
 
      /*----------*/
 
-#ifdef _DEBUG_ 
-     printf("mer_init --> debut initialisation mer %s[%d,%d]\n", 
+#ifdef _DEBUG_
+     printf("mer_init --> debut initialisation mer %s[%d,%d]\n",
 	    fich_mer , nb_lig , nb_col );
 #endif
 
-     /* 
+     /*
       * Ouverture fichier mer
       */
      if( ( fd = open( fich_mer , O_WRONLY | O_CREAT , 0666)) == -1 )
@@ -140,10 +140,10 @@ mer_initialiser( const char * fich_mer ,
 	  return(ERREUR);
      }
 
-     /* 
-      * Ecriture des dimensions 
+     /*
+      * Ecriture des dimensions
       */
-     
+
      if( write( fd , &nb_lig , sizeof(int)) == -1 )
      {
 	  sprintf( mess , "mer_init : erreur sur ecriture nb lignes=%i\n", nb_lig );
@@ -159,7 +159,7 @@ mer_initialiser( const char * fich_mer ,
      }
 
      /*
-      * Ecriture du nombre de bateaux 
+      * Ecriture du nombre de bateaux
       */
 
      nb_bateaux = 0 ;
@@ -170,7 +170,7 @@ mer_initialiser( const char * fich_mer ,
 	  return(ERREUR) ;
      }
 
-     /* 
+     /*
       * Ecriture de l'aire de jeu vide
       */
 
@@ -192,20 +192,20 @@ mer_initialiser( const char * fich_mer ,
       */
      close(fd);
 
-#ifdef _DEBUG_ 
+#ifdef _DEBUG_
      printf("mer_init --> fin initialisation mer %s\n", fich_mer);
 #endif
-     
+
      return(CORRECT);
 }
 
 
-/* 
+/*
  * Lecture du nombre de bateaux dans la mer
  */
 
-extern 
-int 
+extern
+int
 mer_nb_bateaux_lire( const int fd, /* descritpteur fichier mer */
 		     int * nb_bateaux      ) /* Nombre de bateaux */
 {
@@ -214,8 +214,8 @@ mer_nb_bateaux_lire( const int fd, /* descritpteur fichier mer */
 
      /*----------*/
 
-     /* 
-      * Positionnement sur le nombre de bateaux 
+     /*
+      * Positionnement sur le nombre de bateaux
       * (saut des dimensions depuis le bedut du fichier)
       */
 
@@ -227,8 +227,8 @@ mer_nb_bateaux_lire( const int fd, /* descritpteur fichier mer */
  	  return(ERREUR) ;
      }
 
-     /* 
-      * Lecture du nombre de bateaux 
+     /*
+      * Lecture du nombre de bateaux
       */
 
      if( read( fd , nb_bateaux , sizeof(int)) == -1 )
@@ -241,22 +241,24 @@ mer_nb_bateaux_lire( const int fd, /* descritpteur fichier mer */
 }
 
 
-/* 
+/*
  * Ecriture du nombre de bateaux dans la mer
  */
 
-extern 
-int 
+extern
+int
 mer_nb_bateaux_ecrire( const int fd, /* descritpteur fichier mer */
 		       const int nb_bateaux ) /* Nombre de bateaux */
 {
+
+
      int nb = nb_bateaux ;
      char mess[MESS_LONGUEUR] ;
 
      /*----------*/
 
-     /* 
-      * Positionnement sur le nombre de bateaux 
+     /*
+      * Positionnement sur le nombre de bateaux
       * (saut des dimensions depuis le bedut du fichier)
       */
 
@@ -268,26 +270,26 @@ mer_nb_bateaux_ecrire( const int fd, /* descritpteur fichier mer */
  	  return(ERREUR) ;
      }
 
-     /* 
-      * Ecriture du nombre de bateaux 
+     /*
+      * Ecriture du nombre de bateaux
       */
 
      if( write( fd , &nb , sizeof(int)) == -1 )
      {
-	  perror("mer_nb_bateaux_lire : Pb read sur lecture nb bateaux");
-	  return(ERREUR) ;
+	      perror("mer_nb_bateaux_lire : Pb read sur lecture nb bateaux");
+	      return(ERREUR) ;
      }
 
      return(CORRECT);
 }
 
 /*
- * Recherche des cases voisines d'un bateau dans la mer 
+ * Recherche des cases voisines d'un bateau dans la mer
  * La liste des voisins est creee
  */
 
 extern
-int 
+int
 mer_voisins_rechercher( const int fd,		  /* Fichier mer */
 			const bateau_t * const bateau,	  /* Bateau */
 			coords_t ** liste_voisins) /* Coordonnees des cases voisines */
@@ -301,7 +303,7 @@ mer_voisins_rechercher( const int fd,		  /* Fichier mer */
      /* Bateau */
      int proue_lig , proue_col ;	/* Coord proue */
      off_t proue_pos ;
-     orientation_t orientation ;	
+     orientation_t orientation ;
      coord_t coord_voisin ;
 
      /*----------*/
@@ -311,8 +313,8 @@ mer_voisins_rechercher( const int fd,		  /* Fichier mer */
       * - si bateau horizontal : une case a gauche de la proue, une case a droite de la poupe, cases ligne du dessus et ligne du dessous
       */
 
-     /* 
-      * Lecture des dimensions de la mer 
+     /*
+      * Lecture des dimensions de la mer
       */
 
      mer_dim_lire( fd , &nb_lig , &nb_col );
@@ -325,25 +327,25 @@ mer_voisins_rechercher( const int fd,		  /* Fichier mer */
 
      taille_ligne = (size_t)(nb_col*taille_case) ;
 
-     /* 
-      * Determination de l'orientation du bateau 
+     /*
+      * Determination de l'orientation du bateau
       */
-     
+
      orientation = coord_orientation_donner(  coords_coord_get( bateau_corps_get(bateau) , 0 ),
 					      coords_coord_get( bateau_corps_get(bateau) , BATEAU_TAILLE-1 ) ) ;
-     
-     /* 
-      * Creation liste des coordonnees des voisins 
+
+     /*
+      * Creation liste des coordonnees des voisins
       */
-     coord_get( coords_coord_get( bateau_corps_get( bateau ) , 0 ) , 
+     coord_get( coords_coord_get( bateau_corps_get( bateau ) , 0 ) ,
 		&proue_lig , &proue_col , &proue_pos );
 
      if( ( (*liste_voisins) = coords_new() ) == NULL )
-       return(-1) ; 
-     
+       return(-1) ;
+
      switch( orientation )
      {
-	case VERTICAL : 
+	case VERTICAL :
 	     {
 		  int l ; /* indice de ligne */
 		  int poupe_lig = proue_lig + BATEAU_TAILLE - 1 ;
@@ -353,7 +355,7 @@ mer_voisins_rechercher( const int fd,		  /* Fichier mer */
 		  /* une case au NORD de la proue */
 		  if( proue_lig > 0 )
 		  {
-		       coord_set( &coord_voisin , proue_lig-1 , proue_col , 
+		       coord_set( &coord_voisin , proue_lig-1 , proue_col ,
 				  (off_t)(taille_entete + ((proue_lig-1)*taille_ligne) + (proue_col*taille_case)) ) ;
 		       coords_coord_add( (*liste_voisins) , coord_voisin );
 		  }
@@ -365,31 +367,31 @@ mer_voisins_rechercher( const int fd,		  /* Fichier mer */
 		       {
 			    if( proue_col > 0 )
 			    {
-				 coord_set( &coord_voisin , proue_lig+l , proue_col-1 , 
+				 coord_set( &coord_voisin , proue_lig+l , proue_col-1 ,
 					    (off_t)(taille_entete + ((proue_lig+l)*taille_ligne) + ((proue_col-1)*taille_case)) ) ;
 				 coords_coord_add( (*liste_voisins) , coord_voisin );
 			    }
 
 			    if( proue_col < nb_col-1 )
 			    {
-				 coord_set( &coord_voisin , proue_lig+l , proue_col+1 , 
+				 coord_set( &coord_voisin , proue_lig+l , proue_col+1 ,
 					    (off_t)(taille_entete + ((proue_lig+l)*taille_ligne) + ((proue_col+1)*taille_case)) ) ;
 				 coords_coord_add( (*liste_voisins) , coord_voisin );
 			    }
 		       }
 		  }
-		  
+
 		  /* une case au SUD de la poupe */
 		  if( poupe_lig+1 < nb_lig )
 		  {
-		       coord_set( &coord_voisin , poupe_lig+1 , proue_col , 
+		       coord_set( &coord_voisin , poupe_lig+1 , proue_col ,
 				  (off_t)(taille_entete + ((poupe_lig+1)*taille_ligne) + (proue_col*taille_case)) ) ;
 		       coords_coord_add( (*liste_voisins) , coord_voisin );
 		  }
 
 		  break ;
 	     }
-	case HORIZONTAL : 
+	case HORIZONTAL :
 	     {
 		  int c ; /* Indice de colonne */
 		  int poupe_col = proue_col + BATEAU_TAILLE - 1 ;
@@ -399,7 +401,7 @@ mer_voisins_rechercher( const int fd,		  /* Fichier mer */
 		  /* une case a l'OUEST de la proue */
 		  if( proue_col > 0 )
 		  {
-		       coord_set( &coord_voisin , proue_lig , proue_col-1 , 
+		       coord_set( &coord_voisin , proue_lig , proue_col-1 ,
 				  (off_t)(taille_entete + (proue_lig*taille_ligne) + ((proue_col-1)*taille_case)) ) ;
 		       coords_coord_add( (*liste_voisins) , coord_voisin );
 		  }
@@ -411,42 +413,42 @@ mer_voisins_rechercher( const int fd,		  /* Fichier mer */
 		       {
 			    if( proue_lig > 0 )
 			    {
-				 coord_set( &coord_voisin , proue_lig-1 , proue_col+c , 
+				 coord_set( &coord_voisin , proue_lig-1 , proue_col+c ,
 					       (off_t)(taille_entete + ((proue_lig-1)*taille_ligne) + ((proue_col+c)*taille_case)) ) ;
 				 coords_coord_add( (*liste_voisins) , coord_voisin );
 			    }
 			    if( proue_lig < nb_lig-1 )
 			    {
-				 coord_set( &coord_voisin , proue_lig+1 , proue_col+c , 
+				 coord_set( &coord_voisin , proue_lig+1 , proue_col+c ,
 					       (off_t)(taille_entete + ((proue_lig+1)*taille_ligne) + ((proue_col+c)*taille_case)) ) ;
 				 coords_coord_add( (*liste_voisins) , coord_voisin );
 			    }
 		       }
 		  }
-		  
+
 		  /* une case a l'EST de la poupe */
 		  if( poupe_col+1 < nb_col )
 		  {
-		       coord_set( &coord_voisin , proue_lig , poupe_col+1 , 
+		       coord_set( &coord_voisin , proue_lig , poupe_col+1 ,
 				     (off_t)(taille_entete + ((proue_lig)*taille_ligne) + ((poupe_col+1)*taille_case)) ) ;
 		       coords_coord_add( (*liste_voisins) , coord_voisin );
 		  }
 
 		  break ;
 	     }
-	default : 
+	default :
 	     {
 		  fprintf( stderr , "mer_voisins_rechercher: mauvaise orientation du bateau\n");
 		  bateau_printf( bateau );
 		  return(ERREUR);
 	     }
      }
-     
+
      return(CORRECT) ;
 }
 
 /*
- * Affichage du contenu d'une liste de cases dans la mer 
+ * Affichage du contenu d'une liste de cases dans la mer
  */
 
 extern
@@ -456,7 +458,7 @@ mer_voisins_afficher( const int fd,			/* Fichier mer */
 {
      int i ;
      case_t c ;
-     const int nb_cases = coords_nb_get(liste_cases) ; 
+     const int nb_cases = coords_nb_get(liste_cases) ;
 
      /*--------------------*/
 
@@ -464,9 +466,9 @@ mer_voisins_afficher( const int fd,			/* Fichier mer */
      {
        coord_printf( coords_coord_get( liste_cases , i ) );
        printf( "--> ");
-       mer_case_lire( fd , 
-		      coords_coord_get(liste_cases , i )  , 
-		      &c ); 
+       mer_case_lire( fd ,
+		      coords_coord_get(liste_cases , i )  ,
+		      &c );
        mer_case_printf( c );
        printf( " <--\n");
      }
@@ -483,7 +485,7 @@ mer_voisins_afficher( const int fd,			/* Fichier mer */
  * Sinon :
  * - Retour de la fonction --> ERREUR
  * - Pas d'ecriture dans le fichier mer
- * - Pas d'affectation de la structure bateau 
+ * - Pas d'affectation de la structure bateau
  */
 
 extern
@@ -500,10 +502,10 @@ mer_bateau_initialiser( const int fd,			/* Fichier mer */
      int cpt_orientation       ; /* Compteur d'orientation */
      orientation_t orientation ; /* Orientation ocurante */
 
-     int i ; 
+     int i ;
      int no_err = CORRECT ;
      off_t pos ;
-    
+
 
      coords_t * corps = NULL ;
      coord_t coord_mer ;
@@ -515,36 +517,36 @@ mer_bateau_initialiser( const int fd,			/* Fichier mer */
 
      /*--------------------*/
 
-     /* 
+     /*
       * Lecture des dimensions de la mer
       */
 
      mer_dim_lire(fd, &nb_lig, &nb_col) ;
 
      /*
-      * Creation d'un corps vide 
+      * Creation d'un corps vide
       */
 
-     corps = coords_new() ; 
-     for( i=0 ; i<BATEAU_TAILLE ; i++ ) 
-       coords_coord_add( corps , COORD_VIDE ) ; 
+     corps = coords_new() ;
+     for( i=0 ; i<BATEAU_TAILLE ; i++ )
+       coords_coord_add( corps , COORD_VIDE ) ;
 
-     /* 
-      * Choix aleatoire d'une case de depart 
+     /*
+      * Choix aleatoire d'une case de depart
       */
 
      /* Choix aleatoire des coordonnees de la case de depart */
      init_lig = (int)(random() %  nb_lig ) ;
      init_col = (int)(random() %  nb_col ) ;
-    
-     /* 
+
+     /*
       * Parcours cyclique des cases du fichier mer
       */
      trouve = FAUX ;
 
      /* Initialisations lignes */
      lig = init_lig ;
-     cpt_lig = 0 ; 
+     cpt_lig = 0 ;
      while( (cpt_lig < nb_lig) && (!trouve) )
        {
 	 /* Initialisations colonnes */
@@ -556,27 +558,27 @@ mer_bateau_initialiser( const int fd,			/* Fichier mer */
 	    /* Initialisations orientation */
 	    /* Sauvegarde position de depart */
 	    sauv_lig = lig ;
-	    sauv_col = col ; 
+	    sauv_col = col ;
 	    /* Choix aleatoire d'un bateau horizontal ou vertical */
 	    orientation = (int)(random() % 2) ;
-	    cpt_orientation = 0 ; 
-	    fin_orientation = FAUX ; 
-	    
+	    cpt_orientation = 0 ;
+	    fin_orientation = FAUX ;
+
 	    while( (cpt_orientation < 2) && (!trouve) )
 	      {
 		/* Test si bateau tient dans la mer */
-		switch( orientation ) 
+		switch( orientation )
 		  {
 		  case HORIZONTAL :
-		    if( col+BATEAU_TAILLE > nb_col )  
+		    if( col+BATEAU_TAILLE > nb_col )
 		      {
 			orientation = (orientation+1)%2 ;
-			cpt_orientation++ ; 
-			continue ; 
+			cpt_orientation++ ;
+			continue ;
 		      }
 		    break ;
-		  case VERTICAL : 
-		    if( lig+BATEAU_TAILLE > nb_lig )  
+		  case VERTICAL :
+		    if( lig+BATEAU_TAILLE > nb_lig )
 		      {
 			orientation = (orientation+1)%2 ;
 			cpt_orientation++ ;
@@ -595,24 +597,24 @@ mer_bateau_initialiser( const int fd,			/* Fichier mer */
 		 coord_set( &coord_mer , lig , col , pos ) ;
 		 mer_case_lire( fd , coord_mer , &case_mer );
 		 if( case_mer == MER_CASE_LIBRE )
-		   { 
-		     coords_coord_set( corps , i , coord_mer ) ; 
-		     switch( orientation ) 
+		   {
+		     coords_coord_set( corps , i , coord_mer ) ;
+		     switch( orientation )
 		       {
 		       case HORIZONTAL :
-			 col++ ; 
+			 col++ ;
 			 break ;
-		       case VERTICAL : 
+		       case VERTICAL :
 			 lig++ ;
 			 break ;
 		       }
 		   }
 		 else
 		   {
-		     fin_corps = VRAI ; 
+		     fin_corps = VRAI ;
 		   }
-		 
-		 i++ ;      
+
+		 i++ ;
 	       } /* Fin corps */
 
 	       if( !fin_corps )
@@ -622,27 +624,27 @@ mer_bateau_initialiser( const int fd,			/* Fichier mer */
 	       else
 		 {
 		   /* Restauration position de depart */
-		   lig = sauv_lig ; 
+		   lig = sauv_lig ;
 		   col = sauv_col ;
 		   /* Passage orientation suivante */
 		   orientation = (orientation+1)%2 ;
-		   cpt_orientation++ ; 
+		   cpt_orientation++ ;
 		 }
 
 	      } /* Fin orientation */
-		 
+
 
 	    /* Passage colonne suivante */
 	    if(!trouve)
-	      { 
+	      {
 		col = (col+1) % nb_col ;
-		cpt_col++ ; 
+		cpt_col++ ;
 	      }
 	  } /* Fin colonnes */
 
 	  /* Passage ligne suivante */
-	  if( !trouve) 
-	    {	     
+	  if( !trouve)
+	    {
 	      lig = (lig+1) % nb_lig ;
 	      cpt_lig++ ;
 	    }
@@ -664,14 +666,14 @@ mer_bateau_initialiser( const int fd,			/* Fichier mer */
        }
      else
        {
-	 no_err = ERREUR ; 
+	 no_err = ERREUR ;
        }
 
      /* destruction variable de travail */
-     coords_destroy(&corps) ; 
+     coords_destroy(&corps) ;
 
      /* Gestion retour */
-     return(no_err); 
+     return(no_err);
 
 }
 
@@ -682,14 +684,14 @@ mer_bateau_initialiser( const int fd,			/* Fichier mer */
 
 static
 int
-mer_bateau_vertical_deplacer( const int fd,			/* Fichier mer */ 
+mer_bateau_vertical_deplacer( const int fd,			/* Fichier mer */
 			      bateau_t * bateau,		/* Bateau qui va se deplacer */
 			      const direction_t direction,	/* Direction du deplacement */
 			      coords_t * const liste_voisins,	/* Liste des cases voisines */
 			      booleen_t * deplacement )		/* Indique si le deplacement s'est realise */
 {
      (*deplacement) = VRAI ;
-    
+
      switch( direction )
      {
 	case NORD :
@@ -704,7 +706,7 @@ mer_bateau_vertical_deplacer( const int fd,			/* Fichier mer */
 
 		  /* Verification des positions */
 
-		  coord_get( coords_coord_get( bateau_corps_get(bateau) , 0 ) , 
+		  coord_get( coords_coord_get( bateau_corps_get(bateau) , 0 ) ,
 			     &l, &c, &p );
 		  coord_set( &criteres_nord , l-1 , c , -1 );
 		  if( ( id_nord = coords_coord_seek( liste_voisins,criteres_nord , coord_xy_comparer ) ) == -1 )
@@ -713,8 +715,8 @@ mer_bateau_vertical_deplacer( const int fd,			/* Fichier mer */
 		       break ;
 		  }
 
-		  mer_case_lire( fd, 
-				 coords_coord_get( liste_voisins , id_nord ) , 
+		  mer_case_lire( fd,
+				 coords_coord_get( liste_voisins , id_nord ) ,
 				 &case_nord);
 		  if( case_nord != MER_CASE_LIBRE )
 		  {
@@ -723,11 +725,11 @@ mer_bateau_vertical_deplacer( const int fd,			/* Fichier mer */
 		  }
 
 		  /* Ecriture deplacement dans le fichier mer */
-				 
-		  mer_case_ecrire( fd, 
+
+		  mer_case_ecrire( fd,
 				   coords_coord_get( bateau_corps_get(bateau) , BATEAU_TAILLE-1 ) ,
 				   MER_CASE_LIBRE );
-		  mer_case_ecrire( fd, 
+		  mer_case_ecrire( fd,
 				   coords_coord_get( liste_voisins , id_nord ) ,
 				   bateau_marque_get(bateau) );
 
@@ -735,11 +737,11 @@ mer_bateau_vertical_deplacer( const int fd,			/* Fichier mer */
 
 		  for( i=BATEAU_TAILLE-1 ; i>0 ; i-- )
 		  {
-		    coords_coord_set( bateau_corps_get(bateau) , 
+		    coords_coord_set( bateau_corps_get(bateau) ,
 				      i ,
 				      coords_coord_get( bateau_corps_get(bateau) , i-1 ) ) ;
 		  }
-		  coords_coord_set( bateau_corps_get(bateau) , 
+		  coords_coord_set( bateau_corps_get(bateau) ,
 				      0 ,
 				    coords_coord_get( liste_voisins , id_nord ) ) ;
 		  break ;
@@ -768,8 +770,8 @@ mer_bateau_vertical_deplacer( const int fd,			/* Fichier mer */
 		       }
 		       else
 		       {
-			    mer_case_lire( fd, 
-					   coords_coord_get( liste_voisins , id_est ), 
+			    mer_case_lire( fd,
+					   coords_coord_get( liste_voisins , id_est ),
 					   &case_est);
 			    if( case_est != MER_CASE_LIBRE )
 				 (*deplacement) = FAUX ;
@@ -781,7 +783,7 @@ mer_bateau_vertical_deplacer( const int fd,			/* Fichier mer */
 
 		  if( !(*deplacement) )
 		       break ;
-				 
+
 		  /* Deplacement */
 
 		  for( i=0 ; i<BATEAU_TAILLE ; i++ )
@@ -792,16 +794,16 @@ mer_bateau_vertical_deplacer( const int fd,			/* Fichier mer */
 		       id_est = coords_coord_seek( liste_voisins, criteres_est , coord_xy_comparer ) ;
 
 		       /* Ecriture deplacement dans le fichier mer */
-		       mer_case_ecrire( fd , 
+		       mer_case_ecrire( fd ,
 					coords_coord_get(liste_voisins,id_est),
 					bateau_marque_get(bateau) );
 
-		       mer_case_ecrire( fd , 
+		       mer_case_ecrire( fd ,
 					coords_coord_get( bateau_corps_get(bateau) , i ) ,
 					MER_CASE_LIBRE );
 
 		       /* Mise a jour deplacement dans le bateau */
-		       coords_coord_set( bateau_corps_get(bateau) , 
+		       coords_coord_set( bateau_corps_get(bateau) ,
 					 i ,
 					 coords_coord_get( liste_voisins , id_est ) ) ;
 
@@ -830,8 +832,8 @@ mer_bateau_vertical_deplacer( const int fd,			/* Fichier mer */
 		       break ;
 		  }
 
-		  mer_case_lire( fd, 
-				 coords_coord_get( liste_voisins , id_sud ) , 
+		  mer_case_lire( fd,
+				 coords_coord_get( liste_voisins , id_sud ) ,
 				 &case_sud);
 		  if( case_sud != MER_CASE_LIBRE )
 		  {
@@ -840,12 +842,12 @@ mer_bateau_vertical_deplacer( const int fd,			/* Fichier mer */
 		  }
 
 		  /* Ecriture deplacement dans le fichier mer */
-				 
+
 		  mer_case_ecrire( fd,
 				   coords_coord_get( bateau_corps_get(bateau) , 0 ),
 				   MER_CASE_LIBRE );
 
-		  mer_case_ecrire( fd, 
+		  mer_case_ecrire( fd,
 				   coords_coord_get(liste_voisins , id_sud ),
 				   bateau_marque_get(bateau) );
 
@@ -853,11 +855,11 @@ mer_bateau_vertical_deplacer( const int fd,			/* Fichier mer */
 
 		  for( i=0 ; i<BATEAU_TAILLE-1; i++ )
 		  {
-		    coords_coord_set( bateau_corps_get(bateau) , 
+		    coords_coord_set( bateau_corps_get(bateau) ,
 				      i ,
 				      coords_coord_get( bateau_corps_get(bateau) , i+1 ) ) ;
 		  }
-		  coords_coord_set( bateau_corps_get(bateau) , 
+		  coords_coord_set( bateau_corps_get(bateau) ,
 				    BATEAU_TAILLE-1 ,
 				    coords_coord_get( liste_voisins , id_sud ) ) ;
 		  break ;
@@ -886,8 +888,8 @@ mer_bateau_vertical_deplacer( const int fd,			/* Fichier mer */
 		       }
 		       else
 		       {
-			    mer_case_lire( fd, 
-					   coords_coord_get( liste_voisins , id_ouest ) , 
+			    mer_case_lire( fd,
+					   coords_coord_get( liste_voisins , id_ouest ) ,
 					   &case_ouest);
 			    if( case_ouest != MER_CASE_LIBRE )
 				 (*deplacement) = FAUX ;
@@ -899,7 +901,7 @@ mer_bateau_vertical_deplacer( const int fd,			/* Fichier mer */
 
 		  if( !(*deplacement) )
 		       break ;
-				 
+
 		  /* Deplacement */
 
 		  for( i=0 ; i<BATEAU_TAILLE ; i++ )
@@ -919,24 +921,24 @@ mer_bateau_vertical_deplacer( const int fd,			/* Fichier mer */
 					MER_CASE_LIBRE );
 
 		       /* Mise a jour deplacement dans le bateau */
-		       coords_coord_set( bateau_corps_get(bateau) , 
+		       coords_coord_set( bateau_corps_get(bateau) ,
 					 i ,
 					 coords_coord_get( liste_voisins , id_ouest ) ) ;
 		  }
 
 		  break;
 	     }
-	default : 
+	default :
 	     {
 		  fprintf(stderr , "mer_bateau_vertical_deplacer: mauvaise direction bateau : %s <%d>\n",
 			  coord_dir2string(direction) , direction );
 		  return(ERREUR);
 	     }
      }
-	       
+
      return(CORRECT);
 }
-		
+
 
 /*
  * Deplacement d'un bateau horizontal dans une direction donnee
@@ -945,14 +947,14 @@ mer_bateau_vertical_deplacer( const int fd,			/* Fichier mer */
 
 static
 int
-mer_bateau_horizontal_deplacer( const int fd,			/* Fichier mer */ 
+mer_bateau_horizontal_deplacer( const int fd,			/* Fichier mer */
 				bateau_t * bateau,		/* Bateau qui va se deplacer */
 				const direction_t direction,	/* Direction du deplacement */
 				coords_t * const liste_voisins,	/* Liste des cases voisines */
 				booleen_t * deplacement )	/* Indique si le deplacement s'est realise */
 {
      (*deplacement) = VRAI ;
-    
+
      switch( direction )
      {
 	case NORD :
@@ -979,8 +981,8 @@ mer_bateau_horizontal_deplacer( const int fd,			/* Fichier mer */
 		       }
 		       else
 		       {
-			    mer_case_lire( fd, 
-					   coords_coord_get( liste_voisins , id_nord ) , 
+			    mer_case_lire( fd,
+					   coords_coord_get( liste_voisins , id_nord ) ,
 					   &case_nord);
 			    if( case_nord != MER_CASE_LIBRE )
 				 (*deplacement) = FAUX ;
@@ -991,7 +993,7 @@ mer_bateau_horizontal_deplacer( const int fd,			/* Fichier mer */
 
 		  if( !(*deplacement) )
 		       break ;
-				 
+
 		  /* Deplacement */
 
 		  for( i=0 ; i<BATEAU_TAILLE ; i++ )
@@ -1002,16 +1004,16 @@ mer_bateau_horizontal_deplacer( const int fd,			/* Fichier mer */
 		       id_nord = coords_coord_seek( liste_voisins , criteres_nord , coord_xy_comparer ) ;
 
 		       /* Ecriture deplacement dans le fichier mer */
-		       mer_case_ecrire( fd , 
+		       mer_case_ecrire( fd ,
 					coords_coord_get( liste_voisins , id_nord ) ,
 					bateau_marque_get(bateau) );
 
-		       mer_case_ecrire( fd , 
+		       mer_case_ecrire( fd ,
 					coords_coord_get( bateau_corps_get(bateau) , i ) ,
 					MER_CASE_LIBRE );
 
 		       /* Mise a jour deplacement dans le bateau */
-		       coords_coord_set( bateau_corps_get(bateau) , 
+		       coords_coord_set( bateau_corps_get(bateau) ,
 					 i ,
 					 coords_coord_get( liste_voisins , id_nord ) ) ;
 		  }
@@ -1038,8 +1040,8 @@ mer_bateau_horizontal_deplacer( const int fd,			/* Fichier mer */
 		       break ;
 		  }
 
-		  mer_case_lire( fd, 
-				 coords_coord_get( liste_voisins , id_est ) , 
+		  mer_case_lire( fd,
+				 coords_coord_get( liste_voisins , id_est ) ,
 				 &case_est);
 		  if( case_est != MER_CASE_LIBRE )
 		  {
@@ -1048,12 +1050,12 @@ mer_bateau_horizontal_deplacer( const int fd,			/* Fichier mer */
 		  }
 
 		  /* Ecriture deplacement dans le fichier mer */
-				 
-		  mer_case_ecrire( fd, 
-				   coords_coord_get( liste_voisins , id_est ) , 
+
+		  mer_case_ecrire( fd,
+				   coords_coord_get( liste_voisins , id_est ) ,
 				   bateau_marque_get(bateau) ) ;
 
-		  mer_case_ecrire( fd, 
+		  mer_case_ecrire( fd,
 				   coords_coord_get( bateau_corps_get(bateau) , 0 ),
 				   MER_CASE_LIBRE );
 
@@ -1061,16 +1063,16 @@ mer_bateau_horizontal_deplacer( const int fd,			/* Fichier mer */
 
 		  for( i=0; i<BATEAU_TAILLE-1 ; i++ )
 		  {
-		    coords_coord_set( bateau_corps_get(bateau) , 
+		    coords_coord_set( bateau_corps_get(bateau) ,
 				      i ,
 				      coords_coord_get( bateau_corps_get(bateau) , i+1 ) ) ;
 		  }
-		  coords_coord_set( bateau_corps_get(bateau) , 
+		  coords_coord_set( bateau_corps_get(bateau) ,
 				      BATEAU_TAILLE-1 ,
 				    coords_coord_get( liste_voisins , id_est ) ) ;
 		  break ;
 	     }
-	
+
 	case SUD :
 	     {
 		  coord_t criteres_sud ;
@@ -1095,8 +1097,8 @@ mer_bateau_horizontal_deplacer( const int fd,			/* Fichier mer */
 		       }
 		       else
 		       {
-			    mer_case_lire( fd, 
-					   coords_coord_get( liste_voisins , id_sud ), 
+			    mer_case_lire( fd,
+					   coords_coord_get( liste_voisins , id_sud ),
 					   &case_sud);
 			    if( case_sud != MER_CASE_LIBRE )
 				 (*deplacement) = FAUX ;
@@ -1107,7 +1109,7 @@ mer_bateau_horizontal_deplacer( const int fd,			/* Fichier mer */
 
 		  if( !(*deplacement) )
 		       break ;
-				 
+
 		  /* Deplacement */
 
 		  for( i=0 ; i<BATEAU_TAILLE ; i++ )
@@ -1118,16 +1120,16 @@ mer_bateau_horizontal_deplacer( const int fd,			/* Fichier mer */
 		       id_sud = coords_coord_seek( liste_voisins, criteres_sud , coord_xy_comparer ) ;
 
 		       /* Ecriture deplacement dans le fichier mer */
-		       mer_case_ecrire( fd , 
+		       mer_case_ecrire( fd ,
 					coords_coord_get( liste_voisins , id_sud ) ,
 					bateau_marque_get(bateau) );
 
-		       mer_case_ecrire( fd , 
-					coords_coord_get( bateau_corps_get(bateau) , i ), 
+		       mer_case_ecrire( fd ,
+					coords_coord_get( bateau_corps_get(bateau) , i ),
 					MER_CASE_LIBRE );
 
 		       /* Mise a jour deplacement dans le bateau */
-		       coords_coord_set( bateau_corps_get(bateau) , 
+		       coords_coord_set( bateau_corps_get(bateau) ,
 					 i ,
 					 coords_coord_get( liste_voisins , id_sud ) ) ;
 		  }
@@ -1156,8 +1158,8 @@ mer_bateau_horizontal_deplacer( const int fd,			/* Fichier mer */
 		       break ;
 		  }
 
-		  mer_case_lire( fd, 
-				 coords_coord_get( liste_voisins , id_ouest ), 
+		  mer_case_lire( fd,
+				 coords_coord_get( liste_voisins , id_ouest ),
 				 &case_ouest);
 		  if( case_ouest != MER_CASE_LIBRE )
 		  {
@@ -1166,12 +1168,12 @@ mer_bateau_horizontal_deplacer( const int fd,			/* Fichier mer */
 		  }
 
 		  /* Ecriture deplacement dans le fichier mer */
-				 
-		  mer_case_ecrire( fd, 
+
+		  mer_case_ecrire( fd,
 				   coords_coord_get( liste_voisins , id_ouest ) ,
 				   bateau_marque_get(bateau) );
 
-		  mer_case_ecrire( fd, 
+		  mer_case_ecrire( fd,
 				   coords_coord_get( bateau_corps_get(bateau) , BATEAU_TAILLE-1 ) ,
 				   MER_CASE_LIBRE );
 
@@ -1179,35 +1181,35 @@ mer_bateau_horizontal_deplacer( const int fd,			/* Fichier mer */
 
 		  for( i=BATEAU_TAILLE-1 ; i>0 ; i-- )
 		  {
-		    coords_coord_set( bateau_corps_get(bateau) , 
+		    coords_coord_set( bateau_corps_get(bateau) ,
 				      i ,
 				      coords_coord_get( bateau_corps_get(bateau) , i-1 ) ) ;
 		  }
-		  coords_coord_set( bateau_corps_get(bateau) , 
+		  coords_coord_set( bateau_corps_get(bateau) ,
 				    0 ,
 				    coords_coord_get( liste_voisins , id_ouest ) ) ;
 		  break ;
 	     }
 
-	default : 
+	default :
 	     {
 		  fprintf(stderr , "mer_bateau_horizontal_deplacer: mauvaise direction bateau : %s <%d>\n",
 			  coord_dir2string(direction) , direction );
 		  return(ERREUR);
 	     }
      }
-	       
+
      return(CORRECT);
 }
-				    
-/* 
+
+/*
  * Deplacement d'un bateau sur la mer :
  * - choix aleatoire d'une direction de deplacement dans les cases voisines
- * - ecriture dans les cases des nouvelles positions 
+ * - ecriture dans les cases des nouvelles positions
  * - effacement du contenu des cases des anciennes positions
  */
 
-extern 
+extern
 int
 mer_bateau_deplacer( const int fd ,			/* Fichier mer */
 		     bateau_t * bateau,			/* Bateau a deplacer */
@@ -1218,15 +1220,15 @@ mer_bateau_deplacer( const int fd ,			/* Fichier mer */
      direction_t direction = NORD ;
      int noerr = CORRECT ;
      orientation_t orientation = coord_orientation_donner( coords_coord_get( bateau_corps_get(bateau) , 0 ),
-							   coords_coord_get( bateau_corps_get(bateau) , BATEAU_TAILLE-1 ) ); 
-     static booleen_t first = VRAI ; 
+							   coords_coord_get( bateau_corps_get(bateau) , BATEAU_TAILLE-1 ) );
+     static booleen_t first = VRAI ;
      booleen_t cycle = FAUX ;
-     const int nb_voisins = coords_nb_get(liste_voisins) ; 
+     const int nb_voisins = coords_nb_get(liste_voisins) ;
 
      /*----------*/
-    
-     /* 
-      * Test liste vide 
+
+     /*
+      * Test liste vide
       */
 
      if( nb_voisins == 0 )
@@ -1235,12 +1237,12 @@ mer_bateau_deplacer( const int fd ,			/* Fichier mer */
 	  return(CORRECT) ;
      }
 
-     /* 
-      * Traitement liste au moins un voisin 
+     /*
+      * Traitement liste au moins un voisin
       */
 
 
-     /* Initialisation de la fonction random */  
+     /* Initialisation de la fonction random */
      if( first )
      {
 	  srandom((unsigned int)time((time_t *)NULL)) ;
@@ -1251,13 +1253,13 @@ mer_bateau_deplacer( const int fd ,			/* Fichier mer */
      direction_initiale = (int)(random() % 4 ) ;
 
      /* Parcours cyclique des 4 points cardinaux */
-	  
+
      direction = direction_initiale ;
      (*deplacement) = FAUX ;
      cycle = FAUX ;
      while( (!cycle) && (! (*deplacement) ) )
      {
-	
+
 	  switch( orientation )
 	  {
 	     case VERTICAL :
@@ -1312,11 +1314,11 @@ mer_bateau_deplacer( const int fd ,			/* Fichier mer */
      return(CORRECT);
 }
 
-/* 
+/*
  * Lecture des dimensions de la mer
  */
 
-extern 
+extern
 int
 mer_dim_lire( const int fd,	/* descripteur fichier mer */
 	      int * nb_lig,	/* nombre de lignes */
@@ -1327,13 +1329,13 @@ mer_dim_lire( const int fd,	/* descripteur fichier mer */
 
      /*----------*/
 
-     /* 
-      * Initialisation des resultats 
+     /*
+      * Initialisation des resultats
       */
-     (*nb_lig) = 0 ; 
-     (*nb_col) = 0 ; 
+     (*nb_lig) = 0 ;
+     (*nb_col) = 0 ;
 
-     /* 
+     /*
       * Mise de la position courante au debut du fichier
       */
 
@@ -1345,10 +1347,10 @@ mer_dim_lire( const int fd,	/* descripteur fichier mer */
 	  return(ERREUR) ;
      }
 
-     /* 
-      * Lecture des dimensions du mer 
+     /*
+      * Lecture des dimensions du mer
       */
-     
+
      if( read( fd , nb_lig , sizeof(int)) == -1 )
      {
 	  perror("mer_afficher : Pb read sur lecture nb lignes");
@@ -1372,23 +1374,23 @@ mer_dim_lire( const int fd,	/* descripteur fichier mer */
 extern
 int
 mer_lc2pos( const int fd, /* descripteur fichier mer */
-	    const int l,  /* ligne   dans le tableau mer */  
+	    const int l,  /* ligne   dans le tableau mer */
 	    const int c,  /* colonne dans le tableau mer */
 	    off_t * pos ) /* position dans le fichier mer */
 {
 
      int nb_lig ;
-     int nb_col ; 
+     int nb_col ;
 
      /*--------------------*/
 
-     /* 
-      * Lecture des dimensions de la mer 
+     /*
+      * Lecture des dimensions de la mer
       */
-     
+
      mer_dim_lire( fd , &nb_lig , &nb_col );
 
-     /* 
+     /*
       * Calcul position fichier
       */
 
@@ -1405,28 +1407,28 @@ extern
 int
 mer_pos2lc( const int fd,	/* Descripteur fichier mer */
 	    const off_t pos,	/* Position dans le fichier mer */
-	    int * l,		/* Ligne   dans le tableau mer */  
+	    int * l,		/* Ligne   dans le tableau mer */
 	    int * c)		/* Colonne dans le tableau mer */
 
 {
      int taille_lig = 0 ;
      int nb_lig = 0 ;
-     int nb_col = 0 ;     
+     int nb_col = 0 ;
      int pos_w = pos - MER_TAILLE_ENTETE ;
 
      /*--------------------*/
 
      /*
-      * Initialisation des resultats 
+      * Initialisation des resultats
       */
 
      (*l) = -1 ;
      (*c) = -1 ;
 
-     /* 
-      * Lecture des dimensions de la mer 
+     /*
+      * Lecture des dimensions de la mer
       */
-     
+
      mer_dim_lire( fd , &nb_lig , &nb_col );
 
      taille_lig = nb_col * MER_TAILLE_CASE ;
@@ -1440,10 +1442,10 @@ mer_pos2lc( const int fd,	/* Descripteur fichier mer */
 
 /*
  * Lecture d'une case de la mer
- */ 
+ */
 
-extern 
-int 
+extern
+int
 mer_case_lire( const int fd,		/* descripteur du fichier mer */
 	       const coord_t coord,	/* coordonnees de la case a lire */
 	       case_t * contenu )	/* contenu de la case a lire */
@@ -1460,7 +1462,7 @@ mer_case_lire( const int fd,		/* descripteur du fichier mer */
 	  perror("Pb lseek") ;
 	  return(ERREUR) ;
      }
-     
+
      if( read( fd , contenu , MER_TAILLE_CASE ) == -1 )
      {
 	  fprintf( stderr , "mer_case_lire : Pb read sur lecture de la case " );
@@ -1473,12 +1475,12 @@ mer_case_lire( const int fd,		/* descripteur du fichier mer */
 }
 
 
-/* 
+/*
  * Ecriture d'une case de la mer
  */
 
 extern
-int 
+int
 mer_case_ecrire( const int fd,
 		 const coord_t coord,
 		 const case_t contenu )
@@ -1508,18 +1510,18 @@ mer_case_ecrire( const int fd,
 
      return(CORRECT) ;
 }
-		   
-/* 
- * Acquisition d'une cible par bateau sur la mer 
- * Choix aleatoire d'une case de la mer 
- * - sur laquelle il y a un bateau 
+
+/*
+ * Acquisition d'une cible par bateau sur la mer
+ * Choix aleatoire d'une case de la mer
+ * - sur laquelle il y a un bateau
  * - qui ne soit pas celui d'ou vient le coup
- * Si la recherche se passe bien 
- * - retour --> CORRECT 
+ * Si la recherche se passe bien
+ * - retour --> CORRECT
  * - si une cible est trouvee :
  *   - affectation des coordonnees de la cible (une case de la mer) dans le parametre <cible>
  *   - <acquisition> est a VRAI
- * - si on ne peux acquerir aucune cible 
+ * - si on ne peux acquerir aucune cible
  *   - <cible> est a NULL
  *   - <acquisition> est a FAUX
  */
@@ -1540,20 +1542,20 @@ mer_bateau_cible_acquerir( const int fd,		/* Mer */
      int id ;			/* Indice dans liste */
      booleen_t trouve = FAUX ;	/* Indicateur d'arret du parcours */
 
-     static booleen_t first = VRAI ; 
+     static booleen_t first = VRAI ;
 
      char mess[MESS_LONGUEUR] ;
 
      /*--------------------*/
-     
-     /* 
-      * Lecture des dimensions de la mer 
+
+     /*
+      * Lecture des dimensions de la mer
       */
-     
+
      mer_dim_lire( fd , &nb_lig , &nb_col );
-     
-     /* 
-      * Positionnement au bord de la mer 
+
+     /*
+      * Positionnement au bord de la mer
       */
 
      if( lseek(fd, MER_TAILLE_ENTETE , SEEK_SET) == -1 )
@@ -1564,11 +1566,11 @@ mer_bateau_cible_acquerir( const int fd,		/* Mer */
 	  return(ERREUR) ;
      }
 
-     /* 
-      * Choix aleatoire d'une case de depart 
+     /*
+      * Choix aleatoire d'une case de depart
       */
 
-     /* Initialisation de la fonction random */  
+     /* Initialisation de la fonction random */
      if( first )
      {
 	  srandom((unsigned int)time((time_t *)NULL)) ;
@@ -1591,8 +1593,8 @@ mer_bateau_cible_acquerir( const int fd,		/* Mer */
 	  {
 	       mer_lc2pos( fd , lig , col , &pos ) ;
 	       coord_set( &coord_mer , lig , col , pos );
-	       if( ( id = coords_coord_seek( bateau_corps_get(bateau) , 
-					     coord_mer , 
+	       if( ( id = coords_coord_seek( bateau_corps_get(bateau) ,
+					     coord_mer ,
 					     coord_xy_comparer ) ) == -1 )
 		 {
 		    /* Le bateau ne se tire pas dessus */
@@ -1613,16 +1615,16 @@ mer_bateau_cible_acquerir( const int fd,		/* Mer */
 	  coord_copier( cible , coord_mer );
      }
      (*acquisition) = trouve ;
-     
+
      return(CORRECT);
 }
-			   
-/* 
+
+/*
  * Envoie du boulet dans une case
  */
 
 extern
-int 
+int
 mer_bateau_cible_tirer( const int fd,
 			const coord_t coord )
 {
@@ -1631,7 +1633,7 @@ mer_bateau_cible_tirer( const int fd,
 
      /*----------*/
 
-#ifdef _DEBUG_ 
+#ifdef _DEBUG_
      printf( "mer_bateau_cible_tirer --> ecriture " );
      mer_case_printf( MER_CASE_BOULET );
      printf( " a la case ");
@@ -1658,7 +1660,7 @@ mer_bateau_cible_tirer( const int fd,
  */
 
 extern
-int 
+int
 mer_bateau_est_touche( const int fd,
 		       const bateau_t * const bateau ,
 		       booleen_t * touche )
@@ -1687,12 +1689,12 @@ mer_bateau_est_touche( const int fd,
 }
 
 
-/* 
+/*
  * Coule/efface un bateau de la mer
  */
 
 extern
-int 
+int
 mer_bateau_couler( const int fd,
 		   const bateau_t * const bateau )
 {
@@ -1703,7 +1705,7 @@ mer_bateau_couler( const int fd,
 
      for( i=0 ; i<BATEAU_TAILLE ; i++ )
      {
-	  if( (no_err = mer_case_ecrire( fd, 
+	  if( (no_err = mer_case_ecrire( fd,
 					 coords_coord_get( bateau_corps_get(bateau) , i ),
 					 MER_CASE_LIBRE ) ) )
 	       return(no_err);
@@ -1711,6 +1713,3 @@ mer_bateau_couler( const int fd,
      }
      return(CORRECT);
 }
-
-
-
