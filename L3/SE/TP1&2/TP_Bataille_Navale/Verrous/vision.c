@@ -11,20 +11,24 @@
 
 #include <mer.h>
 
-/*--------------------* 
- * Main demon 
+
+struct stat infomer;
+time_t datemodif;
+
+/*--------------------*
+ * Main demon
  *--------------------*/
 int
 main( int nb_arg , char * tab_arg[] )
 {
      char fich_mer[128] ;
      char nomprog[256] ;
- 
+
      /*----------*/
 
      if( nb_arg != 2 )
      {
-	  fprintf( stderr , "Usage : %s <fichier mer>\n", 
+	  fprintf( stderr , "Usage : %s <fichier mer>\n",
 		   tab_arg[0] );
 	  exit(-1);
      }
@@ -32,12 +36,26 @@ main( int nb_arg , char * tab_arg[] )
      strcpy( nomprog , tab_arg[0] );
      strcpy( fich_mer , tab_arg[1] );
 
+     int fd1 = open(fich_mer,O_RDONLY);
+
 
      printf("\n%s : ----- Debut de l'affichage de la mer ----- \n", nomprog );
 
-     /***********/
-     /* A FAIRE */
-     /***********/
+     stat(fich_mer,&infomer);
+     datemodif = infomer.st_ctime;
+     mer_afficher(fd1);
+
+     while(1){
+
+      stat(fich_mer,&infomer);
+
+      if(datemodif != infomer.st_ctime){
+        mer_afficher(fd1);
+        datemodif = infomer.st_ctime;
+      }
+     }
+
+
 
      printf("\n%s : --- Arret de l'affichage de la mer ---\n", nomprog );
 

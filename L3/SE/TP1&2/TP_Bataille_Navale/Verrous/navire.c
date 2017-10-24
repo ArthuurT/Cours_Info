@@ -34,9 +34,40 @@ void PoseVerrouBateau(int fd1, bateau_t * bateau, int mode){
   }
 
   if(mode == 0 || mode == 1) printf("\nPose du verrou Bouclier --> SUCCESS\n");
-  else printf("Desactivation du verrou Bouclier --> SUCESS");
+  else printf("Desactivation du verrou Bouclier --> SUCCESS");
 
 }
+
+
+void PoseVerrouDeplacement(int fd, bateau_t * bateau, int mode, coords_t * coordvoisins){
+
+  struct flock verrouDeplacement;
+  int i;
+  off_t offset;
+
+  printf("\nListe des voisins:\n");
+  mer_voisins_afficher(fd,coordvoisins);
+  printf("\n");
+
+  for(i = 0; i < coords_nb_get(coordvoisins); i++){
+
+    offset = coord_position_get(coords_coord_get(coordvoisins,i));
+    lseek(fd,offset,SEEK_SET);
+
+    verrouDeplacement.l_type = mode;
+    verrouDeplacement.l_whence = SEEK_CUR;
+    verrouDeplacement.l_start = 0;
+    verrouDeplacement.l_len = 1;
+
+    fcntl(fd,F_SETLKW,verrouDeplacement);
+
+  }
+
+  if(mode == 0 || mode == 1) printf("\nPose du verrou Deplacement --> SUCCESS\n");
+  else printf("Desactivation du verrou Deplacement --> SUCCESS");
+
+}
+
 
 
 /*
@@ -55,11 +86,12 @@ main( int nb_arg , char * tab_arg[] )
   off_t taillemer;
   bateau_t * bateau;
   booleen_t touche = FAUX;
-  boolen_t cible;
-  int nb_touche = 0;
+  booleen_t deplace;
+  booleen_t cible;
   int nb_tourjeu = 0;
   int cpt_bateau;
   coord_t coordcible;
+  coords_t * coordvoisins;
 
 
 
@@ -131,6 +163,7 @@ main( int nb_arg , char * tab_arg[] )
   bateau = bateau_new(coords_new(), marque, getpid());
 
   mer_nb_bateaux_lire(fd1,&cpt_bateau);
+  printf("CPT BATEAU : %i\n",cpt_bateau);
   cpt_bateau++;
   mer_nb_bateaux_ecrire(fd1,cpt_bateau);
 
@@ -166,18 +199,24 @@ main( int nb_arg , char * tab_arg[] )
 
     printf("\n// Tour de jeu n°%i \\\\ \n",nb_tourjeu);
 
-    /* Desactivation du verrou bouclier si touché 1ère fois / mort si 2ème fois */
+    /* Desactivation du verrou bouclier si energie < SEUIL  */
+
+    if(energie < BATEAU_SEUIL_BOUCLIER){
+      PoseVerrouBateau(fd1,bateau,2); //mode = 2 -> UNLCK
+    }
 
     mer_bateau_est_touche(fd1,bateau,&touche);
 
-    if(touche == VRAI && nb_touche == 0){
+    /* Bateau touché avec bouclier en place */
 
-      printf("\nBateau touché -> plus de bouclier\n");
-      nb_touche++;
+    if(touche == VRAI && energie >= BATEAU_SEUIL_BOUCLIER){
+
+      printf("\nBateau touché -> Bouclier disponible -> Aucun dégats apparent\n");
       touche = FAUX;
-      PoseVerrouBateau(fd1,bateau,2); //mode = 2 -> UNLCK
 
-    }else if(touche == VRAI && nb_touche == 1){
+    /* Bateau touché sans bouclier en place */
+
+    }else if(touche == VRAI && energie < BATEAU_SEUIL_BOUCLIER){
 
       printf("\nBateau touché -> coulé\n");
       mer_bateau_couler(fd1,bateau);
@@ -199,7 +238,7 @@ main( int nb_arg , char * tab_arg[] )
 
     printf("\nDebut de la phase de tir\n");
 
-    mer_bateau_cible_acquerir(fd1,bateau,cible,coordcible);
+    mer_bateau_cible_acquerir(fd1,bateau,&cible,&coordcible);
 
     if(cible == FAUX){
       printf("Pas de cible trouvé\n");
@@ -219,13 +258,16 @@ main( int nb_arg , char * tab_arg[] )
 
     printf("\nDebut de la phase de déplacement\n");
 
-      
+    mer_voisins_rechercher(fd1,bateau,&coordvoisins);
+    PoseVerrouDeplacement(fd1,bateau,1,coordvoisins);
+    mer_bateau_deplacer(fd1,bateau,coordvoisins,&deplace);
+    PoseVerrouDeplacement(fd1,bateau,2,coordvoisins);
 
-
-
-
-
-
+    if(deplace == VRAI){
+      printf("\nDeplacement effectué\n");
+      energie = energie * 0.95;
+      printf("Energie restante : %f\n",energie);
+    }
 
     printf("\nFin de la phase de déplacement\n");
 
@@ -243,6 +285,11 @@ main( int nb_arg , char * tab_arg[] )
   printf("\n\nPlus de bateau sur la mer\nNavire %c vainqueur\n\n",marque);
 
   printf("****** FIN DE PARTIE ******");
+
+  mer_bateau_couler(fd1,bateau);
+  mer_nb_bateaux_lire(fd1,&cpt_bateau);
+  cpt_bateau--;
+  mer_nb_bateaux_ecrire(fd1,cpt_bateau);
 
   close(fd1);
   exit(1);
