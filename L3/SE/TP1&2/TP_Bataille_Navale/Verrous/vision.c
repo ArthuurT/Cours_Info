@@ -23,6 +23,8 @@ main( int nb_arg , char * tab_arg[] )
 {
      char fich_mer[128] ;
      char nomprog[256] ;
+     int largeur_mer = 10;
+     int longueur_mer = 10;
 
      /*----------*/
 
@@ -37,6 +39,7 @@ main( int nb_arg , char * tab_arg[] )
      strcpy( fich_mer , tab_arg[1] );
 
      int fd1 = open(fich_mer,O_RDONLY);
+     mer_initialiser(fich_mer,largeur_mer,longueur_mer);
 
 
      printf("\n%s : ----- Debut de l'affichage de la mer ----- \n", nomprog );
@@ -55,7 +58,7 @@ main( int nb_arg , char * tab_arg[] )
       }
      }
 
-
+     mer_initialiser(fich_mer,largeur_mer,longueur_mer);
 
      printf("\n%s : --- Arret de l'affichage de la mer ---\n", nomprog );
 

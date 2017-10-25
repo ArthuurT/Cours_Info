@@ -40,7 +40,7 @@ typedef enum { VERTICAL , HORIZONTAL } orientation_t ;
  *=================================================
  */
 
-extern const coord_t coord_vide() ; 
+extern coord_t coord_vide() ; 
 
 extern int coord_ligne_get( const coord_t c ) ;
 extern int coord_ligne_set( coord_t * const c ,

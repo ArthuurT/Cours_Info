@@ -27,7 +27,7 @@ void PoseVerrouBateau(int fd1, bateau_t * bateau, int mode){
     verrouBouclier.l_type = mode;
     verrouBouclier.l_whence = SEEK_CUR;
     verrouBouclier.l_start = 0;
-    verrouBouclier.l_len = 1;
+    verrouBouclier.l_len = MER_TAILLE_CASE;
 
     fcntl(fd1,F_SETLKW,verrouBouclier);
 
@@ -35,6 +35,46 @@ void PoseVerrouBateau(int fd1, bateau_t * bateau, int mode){
 
   if(mode == 0 || mode == 1) printf("\nPose du verrou Bouclier --> SUCCESS\n");
   else printf("Desactivation du verrou Bouclier --> SUCCESS");
+
+}
+
+void PoseVerrouEnTete(int fd1, int mode){
+
+  struct flock verrouEnTete;
+
+
+    verrouEnTete.l_type = mode;
+    verrouEnTete.l_whence = SEEK_SET;
+    verrouEnTete.l_start = 0;
+    verrouEnTete.l_len = MER_TAILLE_ENTETE;
+
+    fcntl(fd1,F_SETLKW,verrouEnTete);
+
+  if(mode == 0 || mode == 1) printf("\nPose du verrou EnTete --> SUCCESS\n");
+  else printf("Desactivation du verrou EnTete --> SUCCESS");
+
+}
+
+void PoseVerrouMer(int fd1, int mode){
+
+  struct flock verrouMer;
+  int rowmer;
+  int colmer;
+  off_t taillemer;
+
+  mer_dim_lire(fd1,&rowmer,&colmer);
+
+  mer_lc2pos(fd1,rowmer,colmer,&taillemer);
+
+  verrouMer.l_type = mode;
+  verrouMer.l_whence = SEEK_SET;
+  verrouMer.l_start = 0;
+  verrouMer.l_len = 0;
+
+  fcntl(fd1,F_SETLKW,verrouMer);
+
+  if(mode == 0 || mode == 1) printf("\nPose du verrou Mer --> SUCCESS\n");
+  else printf("Desactivation du verrou Mer --> SUCCESS");
 
 }
 
@@ -57,7 +97,7 @@ void PoseVerrouDeplacement(int fd, bateau_t * bateau, int mode, coords_t * coord
     verrouDeplacement.l_type = mode;
     verrouDeplacement.l_whence = SEEK_CUR;
     verrouDeplacement.l_start = 0;
-    verrouDeplacement.l_len = 1;
+    verrouDeplacement.l_len = MER_TAILLE_CASE;
 
     fcntl(fd,F_SETLKW,verrouDeplacement);
 
@@ -81,9 +121,6 @@ main( int nb_arg , char * tab_arg[] )
   case_t marque = MER_CASE_LIBRE ;
   char nomprog[128] ;
   float energie = 0.0 ;
-  int rowmer;
-  int colmer;
-  off_t taillemer;
   bateau_t * bateau;
   booleen_t touche = FAUX;
   booleen_t deplace;
@@ -92,16 +129,7 @@ main( int nb_arg , char * tab_arg[] )
   int cpt_bateau;
   coord_t coordcible;
   coords_t * coordvoisins;
-
-
-
-
-  /* variables utilisation verrou */
-
   int fd1;
-  struct flock verrouPosition;
-
-  /* variables création bateau */
 
 
   /*----------*/
@@ -141,68 +169,59 @@ main( int nb_arg , char * tab_arg[] )
   printf("\n\n****** INITALISATION ******\n\n");
 
 
-  /* Creation verrou sur mer pour pose du bateau */
-
   fd1 = open(fich_mer, O_RDWR);
-
-  mer_dim_lire(fd1,&rowmer,&colmer);
-
-  mer_lc2pos(fd1,rowmer,colmer,&taillemer);
-
-  verrouPosition.l_type = F_WRLCK;
-  verrouPosition.l_whence = SEEK_SET;
-  verrouPosition.l_start = 0;
-  verrouPosition.l_len = taillemer;
-
-  fcntl(fd1,F_SETLKW,verrouPosition);
-
-  printf("\nPose du verrou Position --> SUCCESS\n");
 
   /* Pose du bateau sur la mer */
 
+  PoseVerrouMer(fd1,F_WRLCK);
   bateau = bateau_new(coords_new(), marque, getpid());
+  int boolbateau = mer_bateau_initialiser(fd1,bateau);
+  PoseVerrouMer(fd1,F_UNLCK);
 
-  mer_nb_bateaux_lire(fd1,&cpt_bateau);
-  printf("CPT BATEAU : %i\n",cpt_bateau);
-  cpt_bateau++;
-  mer_nb_bateaux_ecrire(fd1,cpt_bateau);
+  sleep(5);
 
-  if(mer_bateau_initialiser(fd1,bateau) == 0){
-    printf("\nPose du bateau sur la mer --> SUCCESS\n\n");
-  }else{
-    printf("\nPose du bateau sur la mer --> FAILURE\n\n");
+  if(boolbateau == CORRECT){
+
+    printf("\n[Bateau %c]: Pose du bateau sur la mer --> SUCCESS\n\n",marque);
+    PoseVerrouEnTete(fd1,F_WRLCK);
+    mer_nb_bateaux_lire(fd1,&cpt_bateau);
+    cpt_bateau++;
+    mer_nb_bateaux_ecrire(fd1,cpt_bateau);
+    PoseVerrouEnTete(fd1,F_UNLCK);
+
+  }else if(boolbateau == ERREUR){
+
+    printf("\n[Bateau %c]:Pose du bateau sur la mer --> FAILURE\n\n",marque);
     exit(1);
+
   }
 
-  coords_printf(bateau->corps);
+  //coords_printf(bateau->corps);
 
   /* Destruction du verrou après que le bateau soit posé */
 
-  verrouPosition.l_type = F_UNLCK;
-  fcntl(fd1,F_SETLKW,verrouPosition);
+  sleep(5);
 
 
     /**********
     *  PARTIE *
     **********/
 
-  printf("\n\n****** DEBUT DE PARTIE ******\n\n");
-
 
   /* Creation d'un verrou sur un bateau (bouclier/energie) */
 
-  PoseVerrouBateau(fd1,bateau,1); // mode = 1 -> WRLCK
+  PoseVerrouBateau(fd1,bateau,F_WRLCK); // mode = 1 -> WRLCK
 
   /* BOUCLE DE JEU */
 
   do{
 
-    printf("\n// Tour de jeu n°%i \\\\ \n",nb_tourjeu);
+    printf("\n[Bateau %c]: // Tour de jeu n°%i \\\\ \n",marque,nb_tourjeu);
 
     /* Desactivation du verrou bouclier si energie < SEUIL  */
 
     if(energie < BATEAU_SEUIL_BOUCLIER){
-      PoseVerrouBateau(fd1,bateau,2); //mode = 2 -> UNLCK
+      PoseVerrouBateau(fd1,bateau,F_UNLCK); //mode = 2 -> UNLCK
     }
 
     mer_bateau_est_touche(fd1,bateau,&touche);
@@ -211,85 +230,92 @@ main( int nb_arg , char * tab_arg[] )
 
     if(touche == VRAI && energie >= BATEAU_SEUIL_BOUCLIER){
 
-      printf("\nBateau touché -> Bouclier disponible -> Aucun dégats apparent\n");
+      printf("\n[Bateau %c]: Bateau touché -> Bouclier disponible -> Aucun dégats apparent\n",marque);
       touche = FAUX;
 
     /* Bateau touché sans bouclier en place */
 
     }else if(touche == VRAI && energie < BATEAU_SEUIL_BOUCLIER){
 
-      printf("\nBateau touché -> coulé\n");
-      mer_bateau_couler(fd1,bateau);
+      printf("\n[Bateau %c]: Bateau touché -> coulé\n",marque);
 
+      PoseVerrouEnTete(fd1,F_WRLCK);
       mer_nb_bateaux_lire(fd1,&cpt_bateau);
       cpt_bateau--;
+      mer_bateau_couler(fd1,bateau);
       mer_nb_bateaux_ecrire(fd1,cpt_bateau);
+      PoseVerrouEnTete(fd1,F_UNLCK);
 
       printf( "\n\n%s : ----- Fin du navire %c (%d) -----\n\n ",
     	  nomprog , marque , getpid() );
       exit(0);
 
     }else{
-      printf("\nBateau non-touché\n");
+      printf("\n[Bateau %c]: Bateau non-touché\n",marque);
     }
 
 
     /* Phase de tir */
 
-    printf("\nDebut de la phase de tir\n");
+    printf("\n[Bateau %c]:Debut de la phase de tir\n",marque);
 
     mer_bateau_cible_acquerir(fd1,bateau,&cible,&coordcible);
 
     if(cible == FAUX){
-      printf("Pas de cible trouvé\n");
+      printf("[Bateau %c]:Pas de cible trouvé\n",marque);
     }else{
-      printf("Cible trouvé\n");
+      printf("[Bateau %c]:Cible trouvé\n",marque);
 
       mer_bateau_cible_tirer(fd1,coordcible);
 
-      printf("Tir effectué\n");
+      printf("[Bateau %c]:Tir effectué\n",marque);
     }
 
-    printf("\nFin de la phase de tir\n");
+    printf("\n[Bateau %c]:Fin de la phase de tir\n",marque);
 
-    sleep(5);
+    sleep(3);
 
     /* Phase de déplacement */
 
-    printf("\nDebut de la phase de déplacement\n");
+    printf("\n[Bateau %c]:Debut de la phase de déplacement\n",marque);
 
     mer_voisins_rechercher(fd1,bateau,&coordvoisins);
-    PoseVerrouDeplacement(fd1,bateau,1,coordvoisins);
+    PoseVerrouDeplacement(fd1,bateau,F_WRLCK,coordvoisins);
     mer_bateau_deplacer(fd1,bateau,coordvoisins,&deplace);
-    PoseVerrouDeplacement(fd1,bateau,2,coordvoisins);
+    PoseVerrouDeplacement(fd1,bateau,F_UNLCK,coordvoisins);
 
     if(deplace == VRAI){
-      printf("\nDeplacement effectué\n");
+      printf("\n[Bateau %c]:Deplacement effectué\n",marque);
       energie = energie * 0.95;
-      printf("Energie restante : %f\n",energie);
+      printf("[Bateau %c]: Energie restante : %f\n",marque,energie);
     }
 
-    printf("\nFin de la phase de déplacement\n");
+    printf("\n[Bateau %c]:Fin de la phase de déplacement\n",marque);
 
-    sleep(5);
+    sleep(3);
 
     nb_tourjeu++;
 
+    PoseVerrouEnTete(fd1,F_RDLCK);
     mer_nb_bateaux_lire(fd1,&cpt_bateau);
+    PoseVerrouEnTete(fd1,F_UNLCK);
 
-    printf("\nNombre de bateau restant sur la mer: %i\n",cpt_bateau);
+    printf("\n[Bateau %c]:Nombre de bateau restant sur la mer: %i\n",marque,cpt_bateau);
 
   }while(cpt_bateau > 1);
 
 
   printf("\n\nPlus de bateau sur la mer\nNavire %c vainqueur\n\n",marque);
 
-  printf("****** FIN DE PARTIE ******");
+  printf("****** FIN DE PARTIE ******\n");
 
-  mer_bateau_couler(fd1,bateau);
+  PoseVerrouEnTete(fd1,F_WRLCK);
   mer_nb_bateaux_lire(fd1,&cpt_bateau);
   cpt_bateau--;
+  mer_bateau_couler(fd1,bateau);
   mer_nb_bateaux_ecrire(fd1,cpt_bateau);
+  PoseVerrouEnTete(fd1,F_UNLCK);
+
 
   close(fd1);
   exit(1);
