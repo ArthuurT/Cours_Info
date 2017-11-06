@@ -5,9 +5,12 @@
 #include <fcntl.h>
 #include <errno.h> /* errno */
 #include <string.h>
-
 #include <bateau.h>
 #include <mer.h>
+
+/*
+ *  Fonctions verrous
+ */
 
 
 void PoseVerrouBateau(int fd1, bateau_t * bateau, int mode){
@@ -77,7 +80,6 @@ void PoseVerrouMer(int fd1, int mode){
   else printf("Desactivation du verrou Mer --> SUCCESS");
 
 }
-
 
 void PoseVerrouDeplacement(int fd, bateau_t * bateau, int mode, coords_t * coordvoisins){
 
@@ -178,7 +180,7 @@ main( int nb_arg , char * tab_arg[] )
   int boolbateau = mer_bateau_initialiser(fd1,bateau);
   PoseVerrouMer(fd1,F_UNLCK);
 
-  sleep(5);
+  sleep(TEMPS_ATTENTE);
 
   if(boolbateau == CORRECT){
 
@@ -200,7 +202,7 @@ main( int nb_arg , char * tab_arg[] )
 
   /* Destruction du verrou après que le bateau soit posé */
 
-  sleep(5);
+  sleep(TEMPS_ATTENTE);
 
 
     /**********
@@ -242,8 +244,8 @@ main( int nb_arg , char * tab_arg[] )
       PoseVerrouEnTete(fd1,F_WRLCK);
       mer_nb_bateaux_lire(fd1,&cpt_bateau);
       cpt_bateau--;
-      mer_bateau_couler(fd1,bateau);
       mer_nb_bateaux_ecrire(fd1,cpt_bateau);
+      mer_bateau_couler(fd1,bateau);
       PoseVerrouEnTete(fd1,F_UNLCK);
 
       printf( "\n\n%s : ----- Fin du navire %c (%d) -----\n\n ",

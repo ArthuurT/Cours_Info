@@ -15,6 +15,23 @@
 struct stat infomer;
 time_t datemodif;
 
+void PoseVerrouEnTete(int fd1, int mode){
+
+  struct flock verrouEnTete;
+
+
+    verrouEnTete.l_type = mode;
+    verrouEnTete.l_whence = SEEK_SET;
+    verrouEnTete.l_start = 0;
+    verrouEnTete.l_len = MER_TAILLE_ENTETE;
+
+    fcntl(fd1,F_SETLKW,verrouEnTete);
+
+  if(mode == 0 || mode == 1) printf("\nPose du verrou EnTete --> SUCCESS\n");
+  else printf("Desactivation du verrou EnTete --> SUCCESS");
+
+}
+
 /*--------------------*
  * Main demon
  *--------------------*/
@@ -25,6 +42,7 @@ main( int nb_arg , char * tab_arg[] )
      char nomprog[256] ;
      int largeur_mer = 10;
      int longueur_mer = 10;
+     int moment = 0;
 
      /*----------*/
 
@@ -53,7 +71,16 @@ main( int nb_arg , char * tab_arg[] )
       stat(fich_mer,&infomer);
 
       if(datemodif != infomer.st_ctime){
+
+        if(moment == 0){
+          printf("\n\nPOSE DES BATEAUX, VEUILLEZ PATIENTER !\n\n");
+          sleep(TEMPS_ATTENTE*2);
+          moment++;
+        }
+
+        PoseVerrouEnTete(fd1,F_RDLCK);
         mer_afficher(fd1);
+        PoseVerrouEnTete(fd1,F_UNLCK);
         datemodif = infomer.st_ctime;
       }
      }
