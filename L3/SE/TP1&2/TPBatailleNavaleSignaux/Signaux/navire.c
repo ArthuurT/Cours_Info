@@ -16,44 +16,27 @@
  */
 
 int Energie ;
-int boolbateau;
-
-booleen_t deplace;
-booleen_t cible;
-
-coord_t coordcible;
-coords_t * coordvoisins;
-
-bateau_t * bateau;
+int EstTouche = 0;
+int EstCree = 0;
 
 /*
  * Handlers
  */
 
-void Creation(int sig){
-
-  bateau = bateau_new(coords_new(), marque, pid_bateau);
-  boolbateau = mer_bateau_initialiser(fd1,bateau);
-  if(boolbateau != CORRECT) printf("ERREUR: Pose du bateau\n");
-
+void DeplacementTirReussi(int sig){
+  printf("Deplacement + Tir réussi\n");
+  signal(SIGINFO,DeplacementTirReussi);
+  Energie = Energie * 0.95;
 }
 
-void Tir(int sig){
-
-  mer_bateau_cible_acquerir(fd1,bateau,&cible,&coordcible);
-  if(cible == VRAI) mer_bateau_cible_tirer(fd1,coordcible);
-  else printf("ERREUR: Tir raté\n");
-
+void EstTouche(int sig){
+  printf("Bateau touché\n");
+  if(Energie < BATEAU_SEUIL_BOUCLIER) EstTouche = 1;
 }
 
-void Deplacement(int sig){
-
-  printf("SIGNAL DEPLACEMENT RECU\n")
-  mer_voisins_rechercher(fd1,bateau,&coordvoisins);
-  mer_bateau_deplacer(fd1,bateau,coordvoisins,&deplace);
-  if(deplace == VRAI) Energie = Energie * 0.95;
-  else printf("ERREUR: Deplacement impossible\n");
-
+void EstCree(int sig){
+  printf("Bateau créer");
+  EstCree = 1;
 }
 
 
@@ -94,36 +77,41 @@ main( int nb_arg , char * tab_arg[] )
 
   printf( "\n\n--- Debut bateau [%d]---\n\n" , pid_bateau );
 
+  sleep(2); // SECURITE: On s'assure que l'amiral est bien en place sur la mer
+
+  /* Capture des signaux */
+
+  signal(SIGINFO,DeplacementTirReussi);
+  signal(SIGUSR2,EstTouche);
+  signal(SIGTST,EstCree);
+
   /* Création du bateau */
 
-  sigaction screation
-  screation.sa_handler = Creation;
-  sigemptyset(&screation.sa_mask);
-  sigaddset(&screation.sa_mask,SIGFPE);
-  sigprocmask(SIG_BLOCK,&screation.sa_mask,NULL);
-  sigaction(SIGCHLD,&screation,NULL);
-  kill(pid_amiral,SIGCHLD);
+  while(EstCree == 0){
 
-  /* Attente */
+    kill(pid_amiral,SIGCHLD);
+    sleep(1);
 
+  }
 
-  /* Déplacement du bateau */
+  do{
 
-  sigaction sdeplacement
-  sdeplacement.sa_handler = Deplacement;
-  sigaction(SIGFPE,&sdeplacement,NULL);
-  kill(pid_amiral,SIGFPE);
+    /* Attente */
 
-  /* Attente */
+    sleep(2);
 
-  wait(2);
+    /* Déplacement du bateau + tir */
 
-  /* Tir du bateau */
+    kill(pid_amiral,SIGFPE);
 
-  sigaction stir
-  stir.sa_handler = Tir;
-  sigaction(SIGFPE,&stir,NULL);
-  kill(pid_amiral,SIGFPE);
+    /* Est touché ? */
+
+    kill(pid_amiral,SIGUSR1);
+    sleep(1);
+
+  while(EstTouche == 0);
+
+  kill(pid_amiral,SIGTERM); // Demande de destruction du bateau
 
   printf( "\n\n--- Arret bateau (%d) ---\n\n" , pid_bateau );
 
