@@ -16,8 +16,9 @@
  */
 
 int Energie ;
-int EstTouche = 0;
-int EstCree = 0;
+int marqEstTouche = 0;
+int marqEstCree = 0;
+int marqAGagne = 0;
 
 /*
  * Handlers
@@ -31,12 +32,17 @@ void DeplacementTirReussi(int sig){
 
 void EstTouche(int sig){
   printf("Bateau touché\n");
-  if(Energie < BATEAU_SEUIL_BOUCLIER) EstTouche = 1;
+  if(Energie < BATEAU_SEUIL_BOUCLIER) marqEstTouche = 1;
 }
 
 void EstCree(int sig){
-  printf("Bateau créer");
-  EstCree = 1;
+  printf("Bateau créer\n");
+  marqEstCree = 1;
+}
+
+void AGagne(int sig){
+  printf("Le processus %i a gagné\n",getpid());
+  marqAGagne = 1;
 }
 
 
@@ -83,11 +89,12 @@ main( int nb_arg , char * tab_arg[] )
 
   signal(SIGINFO,DeplacementTirReussi);
   signal(SIGUSR2,EstTouche);
-  signal(SIGTST,EstCree);
+  signal(SIGTSTP,EstCree);
+  signal(SIGILL,AGagne);
 
   /* Création du bateau */
 
-  while(EstCree == 0){
+  while(marqEstCree == 0){
 
     kill(pid_amiral,SIGCHLD);
     sleep(1);
@@ -109,9 +116,13 @@ main( int nb_arg , char * tab_arg[] )
     kill(pid_amiral,SIGUSR1);
     sleep(1);
 
-  while(EstTouche == 0);
+    /* Ai-je gagné ? */
 
-  kill(pid_amiral,SIGTERM); // Demande de destruction du bateau
+    kill(pid_amiral,SIGILL);
+
+  }while(marqEstTouche == 0 && marqAGagne == 0);
+
+  if(marqEstTouche == 0)kill(pid_amiral,SIGTERM); // Demande de destruction du bateau
 
   printf( "\n\n--- Arret bateau (%d) ---\n\n" , pid_bateau );
 

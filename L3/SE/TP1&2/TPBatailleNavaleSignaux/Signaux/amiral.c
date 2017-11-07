@@ -48,7 +48,7 @@ bateaux_t * liste_bateaux;
 
  void Creation(int sig, siginfo_t * siginfo){
 
-   bateau_creation = bateau_new(coords_new(), marque, siginfo.si_pid);
+   bateau_creation = bateau_new(coords_new(), marque, siginfo->si_pid);
    boolbateau = mer_bateau_initialiser(fd1,bateau_creation);
    if(boolbateau != CORRECT) printf("ERREUR: Pose du bateau\n");
    else{
@@ -56,14 +56,14 @@ bateaux_t * liste_bateaux;
      mer_nb_bateaux_lire(fd1,&nb_bateaux);
      mer_nb_bateaux_ecrire(fd1,nb_bateaux+1);
 
-     kill(siginfo.si_pid,SIGTST);
+     kill(siginfo->si_pid,SIGTSTP);
    }
 
  }
 
  void Action(int sig, siginfo_t * siginfo){
 
-   indice_bateau = bateaux_pid_seek(liste_bateaux,siginfo.si_pid);
+   indice_bateau = bateaux_pid_seek(liste_bateaux,siginfo->si_pid);
    bateau = bateaux_bateau_get(liste_bateaux,indice_bateau);
 
    mer_bateau_cible_acquerir(fd1,bateau,&cible,&coordcible);
@@ -73,28 +73,31 @@ bateaux_t * liste_bateaux;
    mer_voisins_rechercher(fd1,bateau,&coordvoisins);
    mer_bateau_deplacer(fd1,bateau,coordvoisins,&deplace);
 
-   kill(siginfo.si_pid,SIGINFO);
+   kill(siginfo->si_pid,SIGINFO);
 
  }
 
  void EstTouche(int sig, siginfo_t * siginfo){
 
-   indice_bateau_est_touche = bateaux_pid_seek(liste_bateaux,siginfo.si_pid);
+   indice_bateau_est_touche = bateaux_pid_seek(liste_bateaux,siginfo->si_pid);
    bateau_est_touche = bateaux_bateau_get(liste_bateaux,indice_bateau_est_touche);
 
    mer_bateau_est_touche(fd1,bateau_est_touche,&touche);
 
-   if(touche == VRAI) kill(signinfo.si_pid,SIGUSR2);
+   if(touche == VRAI) kill(siginfo->si_pid,SIGUSR2);
 
  }
 
 
  void Destruction(int sig, siginfo_t * siginfo){
 
-   indice_bateau_destruction = bateaux_pid_seek(liste_bateaux,siginfo.si_pid);
+   indice_bateau_destruction = bateaux_pid_seek(liste_bateaux,siginfo->si_pid);
    bateau_destruction = bateaux_bateau_get(liste_bateaux,indice_bateau_destruction);
 
    mer_bateau_couler(fd1,bateau_destruction);
+   bateaux_bateau_del(liste_bateaux,indice_bateau_destruction);
+   mer_nb_bateaux_lire(fd1,&nb_bateaux);
+   mer_nb_bateaux_ecrire(fd1,nb_bateaux-1);
 
 
 
@@ -139,11 +142,14 @@ main( int nb_arg , char * tab_arg[] )
 
      fd1 = open(fich_mer,O_RDWR);
 
+     printf("\nINSTALLATION DES BATEAUX\n");
+     sleep(5);
+
      liste_bateaux = bateaux_new();
 
      /* Capture du signal création */
 
-     sigaction screation;
+     struct sigaction screation;
      screation.sa_sigaction = Creation;
      screation.sa_flags = SA_SIGINFO;
      sigemptyset(&screation.sa_mask);
@@ -156,16 +162,16 @@ main( int nb_arg , char * tab_arg[] )
 
      /* Capture du signal action */
 
-     sigaction saction;
-     saction.sa_handler = Action;
+     struct sigaction saction;
+     saction.sa_sigaction = Action;
      saction.sa_flags = SA_SIGINFO;
      sigaction(SIGFPE,&saction,NULL);
 
 
      /* Capture du signal EstTouche */
 
-     sigaction sesttouche;
-     sesttouche.sa_handler = EstTouche;
+     struct sigaction sesttouche;
+     sesttouche.sa_sigaction = EstTouche;
      sesttouche.sa_flags = SA_SIGINFO;
 
      sigaddset(&sesttouche.sa_mask,SIGFPE);            // Pas d'action sur la mer lors de la vérification d'un bateau touché
@@ -175,17 +181,16 @@ main( int nb_arg , char * tab_arg[] )
 
      /* Capture du signal Destruction */
 
-     sigaction sdestruction;
-     sdestruction.sa_handler = Action;
+     struct sigaction sdestruction;
+     sdestruction.sa_sigaction = Destruction;
      sdestruction.sa_flags = SA_SIGINFO;
 
      sigaddset(&sdestruction.sa_mask,SIGFPE);            // Pas d'action sur la mer lors de la destruction d'un bateau
      sigprocmask(SIG_BLOCK,&sdestruction.sa_mask,NULL);
 
-     sigaction(SITERM,&destruction,NULL);
+     sigaction(SIGTERM,&sdestruction,NULL);
 
-
-     while(1);
+     while(bateaux_nb_get(liste_bateaux) > 1);
 
 
      printf("\n\n\t----- Fin du jeu -----\n\n");
