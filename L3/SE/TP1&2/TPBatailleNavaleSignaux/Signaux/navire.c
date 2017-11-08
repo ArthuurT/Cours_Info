@@ -26,23 +26,34 @@ int marqAGagne = 0;
 
 void DeplacementTirReussi(int sig){
   printf("Deplacement + Tir réussi\n");
-  signal(SIGINFO,DeplacementTirReussi);
+  signal(SIGPIPE,DeplacementTirReussi);
   Energie = Energie * 0.95;
 }
 
 void EstTouche(int sig){
   printf("Bateau touché\n");
+  signal(SIGUSR2,EstTouche);
   if(Energie < BATEAU_SEUIL_BOUCLIER) marqEstTouche = 1;
 }
 
 void EstCree(int sig){
-  printf("Bateau créer\n");
+  printf("Plus de place sur la mer\n");
   marqEstCree = 1;
 }
 
 void AGagne(int sig){
   printf("Le processus %i a gagné\n",getpid());
   marqAGagne = 1;
+}
+
+
+void killSansErreur(pid_t pid, int sig){
+  int r;
+  r = kill(pid,sig);
+  if(r != 0){
+    perror("Erreur kill");
+    exit(-1);
+  }
 }
 
 
@@ -87,42 +98,50 @@ main( int nb_arg , char * tab_arg[] )
 
   /* Capture des signaux */
 
-  signal(SIGINFO,DeplacementTirReussi);
+  signal(SIGPIPE,DeplacementTirReussi);
   signal(SIGUSR2,EstTouche);
   signal(SIGTSTP,EstCree);
   signal(SIGILL,AGagne);
 
   /* Création du bateau */
 
-  while(marqEstCree == 0){
 
-    kill(pid_amiral,SIGCHLD);
-    sleep(1);
 
-  }
+  killSansErreur(pid_amiral,SIGCHLD);
 
-  do{
+  printf("Tentative création bateau\n");
+  sleep(5);
+
+  if(marqEstCree == 1) killSansErreur(getpid(),SIGKILL);
+  else printf("Bateau créé\n");
 
     /* Attente */
 
     sleep(2);
 
+  do{
+
     /* Déplacement du bateau + tir */
 
-    kill(pid_amiral,SIGFPE);
+    killSansErreur(pid_amiral,SIGFPE);
+    printf("Signal deplacement %i\n",getpid());
+    sleep(4);
 
     /* Est touché ? */
 
-    kill(pid_amiral,SIGUSR1);
-    sleep(1);
+    killSansErreur(pid_amiral,SIGUSR1);
+    printf("Signal touche %i\n",getpid());
+    sleep(4);
 
     /* Ai-je gagné ? */
 
-    kill(pid_amiral,SIGILL);
+    killSansErreur(pid_amiral,SIGILL);
+    printf("Signal gagne %i\n",getpid());
+    sleep(4);
 
   }while(marqEstTouche == 0 && marqAGagne == 0);
 
-  if(marqEstTouche == 0)kill(pid_amiral,SIGTERM); // Demande de destruction du bateau
+    if(marqEstTouche == 0)killSansErreur(pid_amiral,SIGBUS); // Demande de destruction du bateau
 
   printf( "\n\n--- Arret bateau (%d) ---\n\n" , pid_bateau );
 

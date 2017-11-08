@@ -28,6 +28,7 @@ int indice_bateau;
 int indice_bateau_est_touche;
 int indice_bateau_destruction;
 int nb_bateaux;
+int cpt_marq = 0;
 
 booleen_t deplace;
 booleen_t cible;
@@ -42,27 +43,39 @@ bateau_t * bateau_creation;
 bateau_t * bateau_est_touche;
 bateaux_t * liste_bateaux;
 
+
+
 /*
  * FONCTIONS LOCALES
  */
 
- void Creation(int sig, siginfo_t * siginfo){
 
-   bateau_creation = bateau_new(coords_new(), marque, siginfo->si_pid);
+ case_t GenererMarque(){
+     case_t car = 'A'+ cpt_marq;
+     cpt_marq++;
+     return car;
+ }
+
+ void Creation(int sig, siginfo_t * siginfo, void * contexte){
+
+   printf("CREATION: siginfo->si_pid = %i\n",siginfo->si_pid);
+   bateau_creation = bateau_new(coords_new(), GenererMarque(), siginfo->si_pid);
    boolbateau = mer_bateau_initialiser(fd1,bateau_creation);
-   if(boolbateau != CORRECT) printf("ERREUR: Pose du bateau\n");
-   else{
+   if(boolbateau != CORRECT){
+     printf("ERREUR: Pose du bateau\n");
+     kill(siginfo->si_pid,SIGTSTP);
+   }else{
      bateaux_bateau_add(liste_bateaux,bateau_creation);
      mer_nb_bateaux_lire(fd1,&nb_bateaux);
      mer_nb_bateaux_ecrire(fd1,nb_bateaux+1);
-
-     kill(siginfo->si_pid,SIGTSTP);
    }
 
+   mer_afficher(fd1);
  }
 
- void Action(int sig, siginfo_t * siginfo){
+ void Action(int sig, siginfo_t * siginfo, void * contexte){
 
+   printf("ACTION: siginfo->si_pid = %i\n",siginfo->si_pid);
    indice_bateau = bateaux_pid_seek(liste_bateaux,siginfo->si_pid);
    bateau = bateaux_bateau_get(liste_bateaux,indice_bateau);
 
@@ -73,24 +86,28 @@ bateaux_t * liste_bateaux;
    mer_voisins_rechercher(fd1,bateau,&coordvoisins);
    mer_bateau_deplacer(fd1,bateau,coordvoisins,&deplace);
 
-   kill(siginfo->si_pid,SIGINFO);
+   kill(siginfo->si_pid,SIGPIPE);
+   mer_afficher(fd1);
 
  }
 
- void EstTouche(int sig, siginfo_t * siginfo){
+ void EstTouche(int sig, siginfo_t * siginfo, void * contexte){
 
+   printf("EST TOUCHE: siginfo->si_pid = %i\n",siginfo->si_pid);
    indice_bateau_est_touche = bateaux_pid_seek(liste_bateaux,siginfo->si_pid);
    bateau_est_touche = bateaux_bateau_get(liste_bateaux,indice_bateau_est_touche);
 
    mer_bateau_est_touche(fd1,bateau_est_touche,&touche);
 
    if(touche == VRAI) kill(siginfo->si_pid,SIGUSR2);
+   mer_afficher(fd1);
 
  }
 
 
- void Destruction(int sig, siginfo_t * siginfo){
+ void Destruction(int sig, siginfo_t * siginfo, void * contexte){
 
+   printf("DESTRUCTION: siginfo->si_pid = %i\n",siginfo->si_pid);
    indice_bateau_destruction = bateaux_pid_seek(liste_bateaux,siginfo->si_pid);
    bateau_destruction = bateaux_bateau_get(liste_bateaux,indice_bateau_destruction);
 
@@ -98,11 +115,14 @@ bateaux_t * liste_bateaux;
    bateaux_bateau_del(liste_bateaux,indice_bateau_destruction);
    mer_nb_bateaux_lire(fd1,&nb_bateaux);
    mer_nb_bateaux_ecrire(fd1,nb_bateaux-1);
-
-
+   mer_afficher(fd1);
 
  }
 
+void AiGagne(int sig, siginfo_t * siginfo, void * contexte){
+   printf("AIGAGNE: siginfo->si_pid = %i\n",siginfo->si_pid);
+   mer_afficher(fd1);
+}
 
 /*
  * Programme Principal
@@ -112,6 +132,8 @@ int
 main( int nb_arg , char * tab_arg[] )
 {
      char fich_mer[128] ;
+     int largeur_mer = 10;
+     int longueur_mer = 10;
 
      /*----------*/
 
@@ -142,8 +164,9 @@ main( int nb_arg , char * tab_arg[] )
 
      fd1 = open(fich_mer,O_RDWR);
 
-     printf("\nINSTALLATION DES BATEAUX\n");
-     sleep(5);
+     mer_initialiser(fich_mer,largeur_mer,longueur_mer);
+     mer_afficher(fd1);
+
 
      liste_bateaux = bateaux_new();
 
@@ -153,10 +176,10 @@ main( int nb_arg , char * tab_arg[] )
      screation.sa_sigaction = Creation;
      screation.sa_flags = SA_SIGINFO;
      sigemptyset(&screation.sa_mask);
-
-     sigaddset(&screation.sa_mask,SIGFPE);              // Pas d'action sur la mer lors de la création d'un bateau
-     sigprocmask(SIG_BLOCK,&screation.sa_mask,NULL);
-
+     sigaddset(&screation.sa_mask,SIGFPE);
+     sigaddset(&screation.sa_mask,SIGUSR1);
+     sigaddset(&screation.sa_mask,SIGBUS);
+     sigaddset(&screation.sa_mask,SIGILL);
      sigaction(SIGCHLD,&screation,NULL);
 
 
@@ -165,6 +188,11 @@ main( int nb_arg , char * tab_arg[] )
      struct sigaction saction;
      saction.sa_sigaction = Action;
      saction.sa_flags = SA_SIGINFO;
+     sigemptyset(&saction.sa_mask);
+     sigaddset(&saction.sa_mask,SIGCHLD);
+     sigaddset(&saction.sa_mask,SIGUSR1);
+     sigaddset(&saction.sa_mask,SIGBUS);
+     sigaddset(&saction.sa_mask,SIGILL);
      sigaction(SIGFPE,&saction,NULL);
 
 
@@ -173,10 +201,11 @@ main( int nb_arg , char * tab_arg[] )
      struct sigaction sesttouche;
      sesttouche.sa_sigaction = EstTouche;
      sesttouche.sa_flags = SA_SIGINFO;
-
-     sigaddset(&sesttouche.sa_mask,SIGFPE);            // Pas d'action sur la mer lors de la vérification d'un bateau touché
-     sigprocmask(SIG_BLOCK,&sesttouche.sa_mask,NULL);
-
+     sigemptyset(&sesttouche.sa_mask);
+     sigaddset(&sesttouche.sa_mask,SIGFPE);
+     sigaddset(&sesttouche.sa_mask,SIGCHLD);
+     sigaddset(&sesttouche.sa_mask,SIGBUS);
+     sigaddset(&sesttouche.sa_mask,SIGILL);
      sigaction(SIGUSR1,&sesttouche,NULL);
 
      /* Capture du signal Destruction */
@@ -184,13 +213,30 @@ main( int nb_arg , char * tab_arg[] )
      struct sigaction sdestruction;
      sdestruction.sa_sigaction = Destruction;
      sdestruction.sa_flags = SA_SIGINFO;
+     sigemptyset(&sdestruction.sa_mask);
+     sigaddset(&sdestruction.sa_mask,SIGFPE);
+     sigaddset(&sdestruction.sa_mask,SIGUSR1);
+     sigaddset(&sdestruction.sa_mask,SIGCHLD);
+     sigaddset(&sdestruction.sa_mask,SIGILL);
+     sigaction(SIGBUS,&sdestruction,NULL);
 
-     sigaddset(&sdestruction.sa_mask,SIGFPE);            // Pas d'action sur la mer lors de la destruction d'un bateau
-     sigprocmask(SIG_BLOCK,&sdestruction.sa_mask,NULL);
+     /* Capture du signal AiGagne */
 
-     sigaction(SIGTERM,&sdestruction,NULL);
+     struct sigaction sgagne;
+     sgagne.sa_sigaction = Action;
+     sgagne.sa_flags = SA_SIGINFO;
+     sigemptyset(&sgagne.sa_mask);
+     sigaddset(&sgagne.sa_mask,SIGFPE);
+     sigaddset(&sgagne.sa_mask,SIGUSR1);
+     sigaddset(&sgagne.sa_mask,SIGBUS);
+     sigaddset(&sgagne.sa_mask,SIGCHLD);
+     sigaction(SIGILL,&sgagne,NULL);
 
-     while(bateaux_nb_get(liste_bateaux) > 1);
+
+    while(1){
+
+        pause();
+    }
 
 
      printf("\n\n\t----- Fin du jeu -----\n\n");
