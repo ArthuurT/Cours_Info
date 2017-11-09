@@ -79,8 +79,12 @@ bateaux_t * liste_bateaux;
    indice_bateau = bateaux_pid_seek(liste_bateaux,siginfo->si_pid);
    bateau = bateaux_bateau_get(liste_bateaux,indice_bateau);
    mer_bateau_cible_acquerir(fd1,bateau,&cible,&coordcible);
-   if(cible == VRAI) mer_bateau_cible_tirer(fd1,coordcible);
-   else printf("ERREUR: Tir raté\n");
+   if(cible != VRAI)
+    printf("ERREUR: Tir raté\n");
+  else
+  //bateaux_coord_seek(liste_bateaux,&coordcible);
+
+
    mer_voisins_rechercher(fd1,bateau,&coordvoisins);
    mer_bateau_deplacer(fd1,bateau,coordvoisins,&deplace);
    kill(siginfo->si_pid,SIGPIPE);
@@ -220,7 +224,7 @@ main( int nb_arg , char * tab_arg[] )
      /* Capture du signal AiGagne */
 
      struct sigaction sgagne;
-     sgagne.sa_sigaction = Action;
+     sgagne.sa_sigaction = AiGagne;
      sgagne.sa_flags = SA_SIGINFO;
      sigemptyset(&sgagne.sa_mask);
      sigaddset(&sgagne.sa_mask,SIGFPE);

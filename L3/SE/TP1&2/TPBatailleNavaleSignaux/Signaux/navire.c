@@ -25,13 +25,13 @@ int marqAGagne = 0;
  */
 
 void DeplacementTirReussi(int sig){
-  printf("Deplacement + Tir réussi\n");
+  printf("Deplacement + Tir réussi (%i)\n",getpid());
   signal(SIGPIPE,DeplacementTirReussi);
   Energie = Energie * 0.95;
 }
 
 void EstTouche(int sig){
-  printf("Bateau touché\n");
+  printf("Bateau touché (%i)\n",getpid());
   signal(SIGUSR2,EstTouche);
   if(Energie < BATEAU_SEUIL_BOUCLIER) marqEstTouche = 1;
 }
@@ -123,25 +123,21 @@ main( int nb_arg , char * tab_arg[] )
 
     /* Déplacement du bateau + tir */
     killSansErreur(pid_amiral,SIGFPE);
-    printf("Signal deplacement %i\n",getpid());
     sleep(4);
 
     /* Est touché ? */
 
     killSansErreur(pid_amiral,SIGUSR1);
-    printf("Signal touche %i\n",getpid());
     sleep(4);
 
     /* Ai-je gagné ? */
 
     killSansErreur(pid_amiral,SIGILL);
-    printf("Signal gagne %i\n",getpid());
     sleep(4);
 
   }while(marqEstTouche == 0 && marqAGagne == 0);
 
-    if(marqEstTouche == 0)killSansErreur(pid_amiral,SIGBUS); // Demande de destruction du bateau
-    else printf("Bateau (%i) a gagné !!",getpid());
+    if(marqEstTouche != 0)killSansErreur(pid_amiral,SIGBUS); // Demande de destruction du bateau
 
   printf( "\n\n--- Arret bateau (%d) ---\n\n" , pid_bateau );
 
