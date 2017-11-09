@@ -78,14 +78,11 @@ bateaux_t * liste_bateaux;
    printf("ACTION: siginfo->si_pid = %i\n",siginfo->si_pid);
    indice_bateau = bateaux_pid_seek(liste_bateaux,siginfo->si_pid);
    bateau = bateaux_bateau_get(liste_bateaux,indice_bateau);
-
    mer_bateau_cible_acquerir(fd1,bateau,&cible,&coordcible);
    if(cible == VRAI) mer_bateau_cible_tirer(fd1,coordcible);
    else printf("ERREUR: Tir raté\n");
-
    mer_voisins_rechercher(fd1,bateau,&coordvoisins);
    mer_bateau_deplacer(fd1,bateau,coordvoisins,&deplace);
-
    kill(siginfo->si_pid,SIGPIPE);
    mer_afficher(fd1);
 
@@ -96,11 +93,8 @@ bateaux_t * liste_bateaux;
    printf("EST TOUCHE: siginfo->si_pid = %i\n",siginfo->si_pid);
    indice_bateau_est_touche = bateaux_pid_seek(liste_bateaux,siginfo->si_pid);
    bateau_est_touche = bateaux_bateau_get(liste_bateaux,indice_bateau_est_touche);
-
    mer_bateau_est_touche(fd1,bateau_est_touche,&touche);
-
    if(touche == VRAI) kill(siginfo->si_pid,SIGUSR2);
-   mer_afficher(fd1);
 
  }
 
@@ -110,9 +104,8 @@ bateaux_t * liste_bateaux;
    printf("DESTRUCTION: siginfo->si_pid = %i\n",siginfo->si_pid);
    indice_bateau_destruction = bateaux_pid_seek(liste_bateaux,siginfo->si_pid);
    bateau_destruction = bateaux_bateau_get(liste_bateaux,indice_bateau_destruction);
-
-   mer_bateau_couler(fd1,bateau_destruction);
    bateaux_bateau_del(liste_bateaux,indice_bateau_destruction);
+   mer_bateau_couler(fd1,bateau_destruction);
    mer_nb_bateaux_lire(fd1,&nb_bateaux);
    mer_nb_bateaux_ecrire(fd1,nb_bateaux-1);
    mer_afficher(fd1);
@@ -121,7 +114,11 @@ bateaux_t * liste_bateaux;
 
 void AiGagne(int sig, siginfo_t * siginfo, void * contexte){
    printf("AIGAGNE: siginfo->si_pid = %i\n",siginfo->si_pid);
-   mer_afficher(fd1);
+   mer_nb_bateaux_lire(fd1,&nb_bateaux);
+   if(nb_bateaux == 1){
+     kill(siginfo->si_pid,SIGILL);
+     mer_afficher(fd1);
+   }
 }
 
 /*
@@ -236,6 +233,7 @@ main( int nb_arg , char * tab_arg[] )
     while(1){
 
         pause();
+
     }
 
 

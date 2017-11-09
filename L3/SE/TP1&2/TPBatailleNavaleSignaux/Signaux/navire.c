@@ -122,7 +122,6 @@ main( int nb_arg , char * tab_arg[] )
   do{
 
     /* Déplacement du bateau + tir */
-
     killSansErreur(pid_amiral,SIGFPE);
     printf("Signal deplacement %i\n",getpid());
     sleep(4);
@@ -142,6 +141,7 @@ main( int nb_arg , char * tab_arg[] )
   }while(marqEstTouche == 0 && marqAGagne == 0);
 
     if(marqEstTouche == 0)killSansErreur(pid_amiral,SIGBUS); // Demande de destruction du bateau
+    else printf("Bateau (%i) a gagné !!",getpid());
 
   printf( "\n\n--- Arret bateau (%d) ---\n\n" , pid_bateau );
 
