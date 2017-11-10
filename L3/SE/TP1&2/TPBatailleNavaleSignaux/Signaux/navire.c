@@ -58,14 +58,6 @@ void AGagne(int sig){
   marqAGagne = 1;
 }
 
-void AskCoulerBateau(){
-  if(marqEstTouche == 1){
-    kill(pid_amiral,SIGUSR1);
-    printf("Bateau coulé (%i)",getpid());
-    exit(0);
-  }
-}
-
 
 /*
  * Programme Principal
@@ -131,25 +123,42 @@ main( int nb_arg , char * tab_arg[] )
 
   do{
 
-    AskCoulerBateau();
+    /* Test bateau detruire */
+
+    if(marqEstTouche == 1){
+      kill(pid_amiral,SIGUSR1);
+      printf("Bateau coulé (%i)",getpid());
+      exit(0);
+    }
 
     /* Déplacement du bateau + tir */
+
     killSansErreur(pid_amiral,SIGFPE);
     sleep(4);
 
+    /* Test bateau detruire */
 
-    AskCoulerBateau();
-
+    if(marqEstTouche == 1){
+      kill(pid_amiral,SIGUSR1);
+      printf("Bateau coulé (%i)",getpid());
+      exit(0);
+    }
 
     /* Ai-je gagné ? */
 
     killSansErreur(pid_amiral,SIGILL);
     sleep(4);
 
-    AskCoulerBateau();
+    /* test bateau detruire */
+
+    if(marqEstTouche == 1){
+      kill(pid_amiral,SIGUSR1);
+      printf("Bateau coulé (%i)",getpid());
+      exit(0);
+    }
 
 
-  }while( marqAGagne == 0);
+  }while(marqAGagne == 0);
 
   printf( "\n\n--- Arret bateau (%d) ---\n\n" , pid_bateau );
 
