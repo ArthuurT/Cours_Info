@@ -95,10 +95,9 @@ pid_t pid_cible;
     bateau_cible = bateaux_bateau_get(liste_bateaux,indice_bateau_cible);
     pid_cible = bateau_pid_get(bateau_cible);
 
-    /* Demande de destruction */
+    /* Indique qu'il est cible */
 
     kill(pid_cible,SIGUSR1);
-    pause();
 
     /* Plus de bouclier --> on coule le bateau ciblé */
 
