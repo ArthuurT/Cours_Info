@@ -45,9 +45,6 @@ void EstTouche(int sig){
   signal(SIGUSR1,EstTouche);
   if(Energie < BATEAU_SEUIL_BOUCLIER){
     marqEstTouche = 1;
-    killSansErreur(pid_amiral,SIGUSR1) ;
-    printf("Bateau coulé (%i)\n",getpid());
-    exit(0);
   }
 }
 
@@ -132,12 +129,25 @@ main( int nb_arg , char * tab_arg[] )
     killSansErreur(pid_amiral,SIGFPE);
     sleep(4);
 
+	if(marqEstTouche == 1){
+		kill(pid_amiral,SIGUSR1
+
+
+
+
     /* Ai-je gagné ? */
 
     killSansErreur(pid_amiral,SIGILL);
     sleep(4);
 
-  }while(marqEstTouche == 0 && marqAGagne == 0);
+    	if(marqEstTouche == 1){
+	    kill(pid_amiral,SIGUSR1);
+	    printf("Bateau coulé (%i)",getpid());
+	    exit(0);
+	}
+
+
+  }while( marqAGagne == 0);
 
   printf( "\n\n--- Arret bateau (%d) ---\n\n" , pid_bateau );
 
