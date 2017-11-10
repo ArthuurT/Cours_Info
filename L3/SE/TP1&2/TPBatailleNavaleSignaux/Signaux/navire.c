@@ -38,9 +38,8 @@ void EstTouche(int sig){
     marqEstTouche = 1;
     kill(pid_amiral,SIGUSR1);
     printf("Bateau coulé (%i)\n",getpid());
+    exit(0);
   }
-  else
-    kill(pid_amiral,SIGUSR2);
 }
 
 void EstCree(int sig){
