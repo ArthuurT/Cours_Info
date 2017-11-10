@@ -27,8 +27,11 @@ int fd1;
 int indice_bateau;
 int indice_bateau_est_touche;
 int indice_bateau_destruction;
+int indice_bateau_cible;
 int nb_bateaux;
 int cpt_marq = 0;
+int marqOui = 0;
+int marqNon = 0;
 
 booleen_t deplace;
 booleen_t cible;
@@ -38,10 +41,13 @@ coord_t coordcible;
 coords_t * coordvoisins;
 
 bateau_t * bateau;
+bateau_t * bateau_cible;
 bateau_t * bateau_destruction;
 bateau_t * bateau_creation;
 bateau_t * bateau_est_touche;
 bateaux_t * liste_bateaux;
+
+pid_t pid_cible;
 
 
 
@@ -75,43 +81,45 @@ bateaux_t * liste_bateaux;
 
  void Action(int sig, siginfo_t * siginfo, void * contexte){
 
-   printf("ACTION: siginfo->si_pid = %i\n",siginfo->si_pid);
-   indice_bateau = bateaux_pid_seek(liste_bateaux,siginfo->si_pid);
-   bateau = bateaux_bateau_get(liste_bateaux,indice_bateau);
-   mer_bateau_cible_acquerir(fd1,bateau,&cible,&coordcible);
-   if(cible != VRAI)
+  printf("ACTION: siginfo->si_pid = %i\n",siginfo->si_pid);
+  indice_bateau = bateaux_pid_seek(liste_bateaux,siginfo->si_pid);
+  bateau = bateaux_bateau_get(liste_bateaux,indice_bateau);
+  mer_bateau_cible_acquerir(fd1,bateau,&cible,&coordcible);
+  if(cible != VRAI)
     printf("ERREUR: Tir raté\n");
-  else
-  //bateaux_coord_seek(liste_bateaux,&coordcible);
+  else{
 
+    /* Recuperation du bateau ciblé */
+
+    indice_bateau_cible = bateaux_coord_seek(liste_bateaux,coordcible);
+    bateau_cible = bateaux_bateau_get(liste_bateaux,indice_bateau_cible);
+    pid_cible = bateau_pid_get(bateau_cible);
+
+    /* Demande de destruction */
+
+    kill(pid_cible,SIGUSR1);
+    pause();
+
+    /* Plus de bouclier --> on coule le bateau ciblé */
+
+    if(marqOui == 1){
+      bateaux_bateau_del(liste_bateaux,indice_bateau_cible);
+      mer_bateau_couler(fd1,bateau_cible);
+      mer_nb_bateaux_lire(fd1,&nb_bateaux);
+      mer_nb_bateaux_ecrire(fd1,nb_bateaux-1);
+      mer_afficher(fd1);
+
+    /* Bouclier encore en place -> Tir sans effet */
+
+    }else if(marqNon == 1){
+      printf("Bouclier en place, tir impossible");
+    }
+
+  }
 
    mer_voisins_rechercher(fd1,bateau,&coordvoisins);
    mer_bateau_deplacer(fd1,bateau,coordvoisins,&deplace);
    kill(siginfo->si_pid,SIGPIPE);
-   mer_afficher(fd1);
-
- }
-
- void EstTouche(int sig, siginfo_t * siginfo, void * contexte){
-
-   printf("EST TOUCHE: siginfo->si_pid = %i\n",siginfo->si_pid);
-   indice_bateau_est_touche = bateaux_pid_seek(liste_bateaux,siginfo->si_pid);
-   bateau_est_touche = bateaux_bateau_get(liste_bateaux,indice_bateau_est_touche);
-   mer_bateau_est_touche(fd1,bateau_est_touche,&touche);
-   if(touche == VRAI) kill(siginfo->si_pid,SIGUSR2);
-
- }
-
-
- void Destruction(int sig, siginfo_t * siginfo, void * contexte){
-
-   printf("DESTRUCTION: siginfo->si_pid = %i\n",siginfo->si_pid);
-   indice_bateau_destruction = bateaux_pid_seek(liste_bateaux,siginfo->si_pid);
-   bateau_destruction = bateaux_bateau_get(liste_bateaux,indice_bateau_destruction);
-   bateaux_bateau_del(liste_bateaux,indice_bateau_destruction);
-   mer_bateau_couler(fd1,bateau_destruction);
-   mer_nb_bateaux_lire(fd1,&nb_bateaux);
-   mer_nb_bateaux_ecrire(fd1,nb_bateaux-1);
    mer_afficher(fd1);
 
  }
@@ -123,6 +131,16 @@ void AiGagne(int sig, siginfo_t * siginfo, void * contexte){
      kill(siginfo->si_pid,SIGILL);
      mer_afficher(fd1);
    }
+}
+
+void ReponseOui (int sig, siginfo_t * siginfo, void * contexte){
+  printf("REPONSEOUI: siginfo->si_pid = %i\n",siginfo->si_pid);
+  marqOui = 1;
+}
+
+void ReponseNon (int sig, siginfo_t * siginfo, void * contexte){
+  printf("REPONSEOUI: siginfo->si_pid = %i\n",siginfo->si_pid);
+  marqNon = 1;
 }
 
 /*
@@ -178,8 +196,6 @@ main( int nb_arg , char * tab_arg[] )
      screation.sa_flags = SA_SIGINFO;
      sigemptyset(&screation.sa_mask);
      sigaddset(&screation.sa_mask,SIGFPE);
-     sigaddset(&screation.sa_mask,SIGUSR1);
-     sigaddset(&screation.sa_mask,SIGBUS);
      sigaddset(&screation.sa_mask,SIGILL);
      sigaction(SIGCHLD,&screation,NULL);
 
@@ -191,35 +207,9 @@ main( int nb_arg , char * tab_arg[] )
      saction.sa_flags = SA_SIGINFO;
      sigemptyset(&saction.sa_mask);
      sigaddset(&saction.sa_mask,SIGCHLD);
-     sigaddset(&saction.sa_mask,SIGUSR1);
-     sigaddset(&saction.sa_mask,SIGBUS);
      sigaddset(&saction.sa_mask,SIGILL);
      sigaction(SIGFPE,&saction,NULL);
 
-
-     /* Capture du signal EstTouche */
-
-     struct sigaction sesttouche;
-     sesttouche.sa_sigaction = EstTouche;
-     sesttouche.sa_flags = SA_SIGINFO;
-     sigemptyset(&sesttouche.sa_mask);
-     sigaddset(&sesttouche.sa_mask,SIGFPE);
-     sigaddset(&sesttouche.sa_mask,SIGCHLD);
-     sigaddset(&sesttouche.sa_mask,SIGBUS);
-     sigaddset(&sesttouche.sa_mask,SIGILL);
-     sigaction(SIGUSR1,&sesttouche,NULL);
-
-     /* Capture du signal Destruction */
-
-     struct sigaction sdestruction;
-     sdestruction.sa_sigaction = Destruction;
-     sdestruction.sa_flags = SA_SIGINFO;
-     sigemptyset(&sdestruction.sa_mask);
-     sigaddset(&sdestruction.sa_mask,SIGFPE);
-     sigaddset(&sdestruction.sa_mask,SIGUSR1);
-     sigaddset(&sdestruction.sa_mask,SIGCHLD);
-     sigaddset(&sdestruction.sa_mask,SIGILL);
-     sigaction(SIGBUS,&sdestruction,NULL);
 
      /* Capture du signal AiGagne */
 
@@ -228,10 +218,30 @@ main( int nb_arg , char * tab_arg[] )
      sgagne.sa_flags = SA_SIGINFO;
      sigemptyset(&sgagne.sa_mask);
      sigaddset(&sgagne.sa_mask,SIGFPE);
-     sigaddset(&sgagne.sa_mask,SIGUSR1);
-     sigaddset(&sgagne.sa_mask,SIGBUS);
      sigaddset(&sgagne.sa_mask,SIGCHLD);
      sigaction(SIGILL,&sgagne,NULL);
+
+     /* Capture du signal ReponseOui */
+
+     struct sigaction soui;
+     soui.sa_sigaction = ReponseOui;
+     soui.sa_flags = SA_SIGINFO;
+     sigemptyset(&soui.sa_mask);
+     sigaddset(&soui.sa_mask,SIGFPE);
+     sigaddset(&soui.sa_mask,SIGCHLD);
+     sigaddset(&soui.sa_mask,SIGILL);
+     sigaction(SIGUSR1,&soui,NULL);
+
+     /* Capture du signal ReponseNon */
+
+     struct sigaction snon;
+     snon.sa_sigaction = ReponseNon;
+     snon.sa_flags = SA_SIGINFO;
+     sigemptyset(&snon.sa_mask);
+     sigaddset(&snon.sa_mask,SIGFPE);
+     sigaddset(&snon.sa_mask,SIGCHLD);
+     sigaddset(&snon.sa_mask,SIGILL);
+     sigaction(SIGUSR2,&snon,NULL);
 
 
     while(1){
