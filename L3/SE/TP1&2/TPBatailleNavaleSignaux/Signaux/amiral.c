@@ -117,7 +117,7 @@ void AiGagne(int sig, siginfo_t * siginfo, void * contexte){
 
 void ReponseOui (int sig, siginfo_t * siginfo, void * contexte){
   printf("REPONSEOUI: siginfo->si_pid = %i\n",siginfo->si_pid);
-
+  fflush(stdout);
   bateaux_bateau_del(liste_bateaux,bateaux_pid_seek(liste_bateaux,siginfo->si_pid));
   mer_bateau_couler(fd1,bateaux_bateau_get(liste_bateaux,bateaux_pid_seek(liste_bateaux,siginfo->si_pid)));
   mer_nb_bateaux_lire(fd1,&nb_bateaux);

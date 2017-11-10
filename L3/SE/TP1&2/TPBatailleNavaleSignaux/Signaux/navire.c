@@ -25,6 +25,15 @@ pid_t pid_amiral ;
  * Handlers
  */
 
+void killSansErreur(pid_t pid, int sig){
+  int r;
+  r = kill(pid,sig);
+  if(r != 0){
+    perror("Erreur kill");
+    exit(-1);
+  }
+}
+
 void DeplacementTirReussi(int sig){
   printf("Deplacement + Tir réussi (%i)\n",getpid());
   signal(SIGPIPE,DeplacementTirReussi);
@@ -36,7 +45,7 @@ void EstTouche(int sig){
   signal(SIGUSR1,EstTouche);
   if(Energie < BATEAU_SEUIL_BOUCLIER){
     marqEstTouche = 1;
-    kill(pid_amiral,SIGUSR1);
+    killSansErreur(pid_amiral,SIGUSR1);
     printf("Bateau coulé (%i)\n",getpid());
     exit(0);
   }
@@ -53,14 +62,6 @@ void AGagne(int sig){
 }
 
 
-void killSansErreur(pid_t pid, int sig){
-  int r;
-  r = kill(pid,sig);
-  if(r != 0){
-    perror("Erreur kill");
-    exit(-1);
-  }
-}
 
 
 /*
