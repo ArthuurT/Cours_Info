@@ -30,8 +30,6 @@ int indice_bateau_destruction;
 int indice_bateau_cible;
 int nb_bateaux;
 int cpt_marq = 0;
-int marqOui = 0;
-int marqNon = 0;
 
 booleen_t deplace;
 booleen_t cible;
@@ -95,32 +93,17 @@ pid_t pid_cible;
     bateau_cible = bateaux_bateau_get(liste_bateaux,indice_bateau_cible);
     pid_cible = bateau_pid_get(bateau_cible);
 
-    /* Indique qu'il est cible */
+    /* Indique au bateau_cible qu'il est ciblé */
 
     kill(pid_cible,SIGUSR1);
 
-    /* Plus de bouclier --> on coule le bateau ciblé */
-
-    if(marqOui == 1){
-      bateaux_bateau_del(liste_bateaux,indice_bateau_cible);
-      mer_bateau_couler(fd1,bateau_cible);
-      mer_nb_bateaux_lire(fd1,&nb_bateaux);
-      mer_nb_bateaux_ecrire(fd1,nb_bateaux-1);
-      mer_afficher(fd1);
-
-    /* Bouclier encore en place -> Tir sans effet */
-
-    }else if(marqNon == 1){
-      printf("Bouclier en place, tir impossible");
-    }
-
-  }
+    /* Phase de déplacement */
 
    mer_voisins_rechercher(fd1,bateau,&coordvoisins);
    mer_bateau_deplacer(fd1,bateau,coordvoisins,&deplace);
    kill(siginfo->si_pid,SIGPIPE);
    mer_afficher(fd1);
-
+  }
  }
 
 void AiGagne(int sig, siginfo_t * siginfo, void * contexte){
@@ -134,12 +117,12 @@ void AiGagne(int sig, siginfo_t * siginfo, void * contexte){
 
 void ReponseOui (int sig, siginfo_t * siginfo, void * contexte){
   printf("REPONSEOUI: siginfo->si_pid = %i\n",siginfo->si_pid);
-  marqOui = 1;
-}
 
-void ReponseNon (int sig, siginfo_t * siginfo, void * contexte){
-  printf("REPONSEOUI: siginfo->si_pid = %i\n",siginfo->si_pid);
-  marqNon = 1;
+  bateaux_bateau_del(liste_bateaux,bateaux_pid_seek(liste_bateaux,siginfo->si_pid));
+  mer_bateau_couler(fd1,bateaux_bateau_get(liste_bateaux,bateaux_pid_seek(liste_bateaux,siginfo->si_pid)));
+  mer_nb_bateaux_lire(fd1,&nb_bateaux);
+  mer_nb_bateaux_ecrire(fd1,nb_bateaux-1);
+  mer_afficher(fd1);
 }
 
 /*
@@ -197,7 +180,6 @@ main( int nb_arg , char * tab_arg[] )
      sigaddset(&screation.sa_mask,SIGFPE);
      sigaddset(&screation.sa_mask,SIGILL);
      sigaddset(&screation.sa_mask,SIGUSR1);
-     sigaddset(&screation.sa_mask,SIGUSR2);
      sigaction(SIGCHLD,&screation,NULL);
 
 
@@ -210,7 +192,6 @@ main( int nb_arg , char * tab_arg[] )
      sigaddset(&saction.sa_mask,SIGCHLD);
      sigaddset(&saction.sa_mask,SIGILL);
      sigaddset(&saction.sa_mask,SIGUSR1);
-     sigaddset(&saction.sa_mask,SIGUSR2);
      sigaction(SIGFPE,&saction,NULL);
 
 
@@ -222,6 +203,7 @@ main( int nb_arg , char * tab_arg[] )
      sigemptyset(&sgagne.sa_mask);
      sigaddset(&sgagne.sa_mask,SIGFPE);
      sigaddset(&sgagne.sa_mask,SIGCHLD);
+     sigaddset(&sgagne.sa_mask,SIGUSR1);
      sigaction(SIGILL,&sgagne,NULL);
 
      /* Capture du signal ReponseOui */
@@ -233,20 +215,7 @@ main( int nb_arg , char * tab_arg[] )
      sigaddset(&soui.sa_mask,SIGFPE);
      sigaddset(&soui.sa_mask,SIGCHLD);
      sigaddset(&soui.sa_mask,SIGILL);
-     sigaddset(&soui.sa_mask,SIGUSR2);
      sigaction(SIGUSR1,&soui,NULL);
-
-     /* Capture du signal ReponseNon */
-
-     struct sigaction snon;
-     snon.sa_sigaction = ReponseNon;
-     snon.sa_flags = SA_SIGINFO;
-     sigemptyset(&snon.sa_mask);
-     sigaddset(&snon.sa_mask,SIGFPE);
-     sigaddset(&snon.sa_mask,SIGCHLD);
-     sigaddset(&snon.sa_mask,SIGILL);
-     sigaddset(&snon.sa_mask,SIGUSR1);
-     sigaction(SIGUSR2,&snon,NULL);
 
 
     while(1){
