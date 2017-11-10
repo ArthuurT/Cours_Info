@@ -62,7 +62,6 @@ pid_t pid_cible;
 
  void Creation(int sig, siginfo_t * siginfo, void * contexte){
 
-   printf("CREATION: siginfo->si_pid = %i\n",siginfo->si_pid);
    bateau_creation = bateau_new(coords_new(), GenererMarque(), siginfo->si_pid);
    boolbateau = mer_bateau_initialiser(fd1,bateau_creation);
    if(boolbateau != CORRECT){
@@ -79,7 +78,6 @@ pid_t pid_cible;
 
  void Action(int sig, siginfo_t * siginfo, void * contexte){
 
-  printf("ACTION: siginfo->si_pid = %i\n",siginfo->si_pid);
   indice_bateau = bateaux_pid_seek(liste_bateaux,siginfo->si_pid);
   bateau = bateaux_bateau_get(liste_bateaux,indice_bateau);
   mer_bateau_cible_acquerir(fd1,bateau,&cible,&coordcible);
@@ -96,6 +94,10 @@ pid_t pid_cible;
     /* Indique au bateau_cible qu'il est ciblé */
 
     kill(pid_cible,SIGUSR1);
+    sleep(2);
+    mer_afficher(fd1);
+    sleep(2);
+
 
     /* Phase de déplacement */
 
@@ -107,7 +109,6 @@ pid_t pid_cible;
  }
 
 void AiGagne(int sig, siginfo_t * siginfo, void * contexte){
-   printf("AIGAGNE: siginfo->si_pid = %i\n",siginfo->si_pid);
    mer_nb_bateaux_lire(fd1,&nb_bateaux);
    if(nb_bateaux == 1){
      kill(siginfo->si_pid,SIGILL);
@@ -116,7 +117,6 @@ void AiGagne(int sig, siginfo_t * siginfo, void * contexte){
 }
 
 void ReponseOui (int sig, siginfo_t * siginfo, void * contexte){
-  printf("REPONSEOUI: siginfo->si_pid = %i\n",siginfo->si_pid);
   mer_bateau_couler(fd1,bateaux_bateau_get(liste_bateaux,bateaux_pid_seek(liste_bateaux,siginfo->si_pid)));
   bateaux_bateau_del(liste_bateaux,bateaux_pid_seek(liste_bateaux,siginfo->si_pid));
   mer_nb_bateaux_lire(fd1,&nb_bateaux);
