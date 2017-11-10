@@ -179,7 +179,6 @@ main( int nb_arg , char * tab_arg[] )
      sigemptyset(&screation.sa_mask);
      sigaddset(&screation.sa_mask,SIGFPE);
      sigaddset(&screation.sa_mask,SIGILL);
-     sigaddset(&screation.sa_mask,SIGUSR1);
      sigaction(SIGCHLD,&screation,NULL);
 
 
@@ -191,7 +190,6 @@ main( int nb_arg , char * tab_arg[] )
      sigemptyset(&saction.sa_mask);
      sigaddset(&saction.sa_mask,SIGCHLD);
      sigaddset(&saction.sa_mask,SIGILL);
-     sigaddset(&saction.sa_mask,SIGUSR1);
      sigaction(SIGFPE,&saction,NULL);
 
 
@@ -203,7 +201,6 @@ main( int nb_arg , char * tab_arg[] )
      sigemptyset(&sgagne.sa_mask);
      sigaddset(&sgagne.sa_mask,SIGFPE);
      sigaddset(&sgagne.sa_mask,SIGCHLD);
-     sigaddset(&sgagne.sa_mask,SIGUSR1);
      sigaction(SIGILL,&sgagne,NULL);
 
      /* Capture du signal ReponseOui */
