@@ -94,9 +94,9 @@ pid_t pid_cible;
     /* Indique au bateau_cible qu'il est ciblé */
 
     kill(pid_cible,SIGUSR1);
-    sleep(2);
+    sleep(1);
     mer_afficher(fd1);
-    sleep(2);
+    sleep(1);
 
 
     /* Phase de déplacement */

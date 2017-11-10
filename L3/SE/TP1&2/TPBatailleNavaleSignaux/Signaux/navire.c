@@ -134,7 +134,7 @@ main( int nb_arg , char * tab_arg[] )
     /* Déplacement du bateau + tir */
 
     killSansErreur(pid_amiral,SIGFPE);
-    sleep(4);
+    sleep(1);
 
     /* Test bateau detruire */
 
@@ -147,7 +147,7 @@ main( int nb_arg , char * tab_arg[] )
     /* Ai-je gagné ? */
 
     killSansErreur(pid_amiral,SIGILL);
-    sleep(4);
+    sleep(1);
 
     /* test bateau detruire */
 
