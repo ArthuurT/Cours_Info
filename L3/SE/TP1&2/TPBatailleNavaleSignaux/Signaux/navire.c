@@ -45,7 +45,7 @@ void EstTouche(int sig){
   signal(SIGUSR1,EstTouche);
   if(Energie < BATEAU_SEUIL_BOUCLIER){
     marqEstTouche = 1;
-    killSansErreur(pid_amiral,SIGUSR1);
+    killSansErreur(pid_amiral,SIGUSR1) ;
     printf("Bateau coulé (%i)\n",getpid());
     exit(0);
   }
