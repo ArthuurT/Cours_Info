@@ -125,6 +125,15 @@ void ReponseOui (int sig, siginfo_t * siginfo, void * contexte){
   mer_afficher(fd1);
 }
 
+void sigactionSansErreur(int sig, struct sigaction * new, struct sigaction * old){
+  int r;
+  r = sigaction(sig,new,old);
+  if(r != 0){
+    perror("Erreur sigaction");
+    exit(-1);
+  }
+}
+
 /*
  * Programme Principal
  */
@@ -179,7 +188,7 @@ main( int nb_arg , char * tab_arg[] )
      sigemptyset(&screation.sa_mask);
      sigaddset(&screation.sa_mask,SIGFPE);
      sigaddset(&screation.sa_mask,SIGILL);
-     sigaction(SIGCHLD,&screation,NULL);
+     sigactionSansErreur(SIGCHLD,&screation,NULL);
 
 
      /* Capture du signal action */
@@ -190,7 +199,7 @@ main( int nb_arg , char * tab_arg[] )
      sigemptyset(&saction.sa_mask);
      sigaddset(&saction.sa_mask,SIGCHLD);
      sigaddset(&saction.sa_mask,SIGILL);
-     sigaction(SIGFPE,&saction,NULL);
+     sigactionSansErreur(SIGFPE,&saction,NULL);
 
 
      /* Capture du signal AiGagne */
@@ -201,7 +210,7 @@ main( int nb_arg , char * tab_arg[] )
      sigemptyset(&sgagne.sa_mask);
      sigaddset(&sgagne.sa_mask,SIGFPE);
      sigaddset(&sgagne.sa_mask,SIGCHLD);
-     sigaction(SIGILL,&sgagne,NULL);
+     sigactionSansErreur(SIGILL,&sgagne,NULL);
 
      /* Capture du signal ReponseOui */
 
@@ -212,7 +221,7 @@ main( int nb_arg , char * tab_arg[] )
      sigaddset(&soui.sa_mask,SIGFPE);
      sigaddset(&soui.sa_mask,SIGCHLD);
      sigaddset(&soui.sa_mask,SIGILL);
-     sigaction(SIGUSR1,&soui,NULL);
+     sigactionSansErreur(SIGUSR1,&soui,NULL);
 
 
     while(1){
