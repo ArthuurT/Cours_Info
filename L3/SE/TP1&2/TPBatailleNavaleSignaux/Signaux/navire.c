@@ -127,7 +127,7 @@ main( int nb_arg , char * tab_arg[] )
 
     if(marqEstTouche == 1){
       kill(pid_amiral,SIGUSR1);
-      printf("Bateau coulé (%i)",getpid());
+      printf("Bateau coulé (%i)\n",getpid());
       exit(0);
     }
 
@@ -140,7 +140,7 @@ main( int nb_arg , char * tab_arg[] )
 
     if(marqEstTouche == 1){
       kill(pid_amiral,SIGUSR1);
-      printf("Bateau coulé (%i)",getpid());
+      printf("Bateau coulé (%i)\n",getpid());
       exit(0);
     }
 
