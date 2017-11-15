@@ -1,0 +1,63 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf290
+{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww23580\viewh18100\viewkind1\viewscale200
+\deftab560
+\pard\tx560\pardeftab560\qc\pardirnatural
+
+\f0\fs18 \cf0 \ul \ulc0 \CocoaLigature0 TP1 Graphes pour l'info (2017)\ulnone \
+\pard\tx560\pardeftab560\qj\pardirnatural
+\cf0 \
+\
+\
+\
+	Les TP doivent \'eatre r\'e9alis\'e9s sur les ordinateurs de l'Universit\'e9. Votre pr\'e9sence au TP est requise pendant 3 heures de temps pour \'e9crire du code et rien d'autre. Courage!\
+\
+\
+TRAVAIL PR\'c9ALABLE: 1\'b0 Faites une copie du code original. Ainsi, vous pourrez r\'e9cup\'e9rer un code valide quand le code sur lequel vous travaillez n'est plus ex\'e9cutable. 2\'b0 R\'e9alisez un makefile g\'e9n\'e9ral capable de lancer l'ex\'e9cution de ce code sur Mac ou PC \'97\'97l'environnement d'ex\'e9cution change d'une salle de TP \'e0 une autre. 3\'b0 Ex\'e9cutez le code avec ce makefile. \
+\
+CONTEXTE: Vous dirigez une petite \'e9quipe d'informaticiens de la soci\'e9t\'e9 Home Slip Home sp\'e9cialis\'e9e dans le transport de mobiles homes et d'autres objets vari\'e9s passablement encombrants: bateaux, grues, charpentes, machines industrielles, tron\'e7ons d'airbus\'85 Votre travail consiste \'e0 compl\'e9ter le code fourni (modules Graphe.c et Outil.c) avec de nouveaux modules (1 par TP: TPi.c pour le TP n\'b0i) qui calculent les co\'fbts des diff\'e9rentes missions (en langage Home Slip Home, une mission est un transport propos\'e9 ou r\'e9alis\'e9 par celle-ci).\
+\
+\
+\pard\tx560\pardeftab560\qj\pardirnatural
+\cf0 \ul Probl\'e8me 1\ulnone \
+	\'c9crire et tester en appelant TP1TESTER(1) depuis le main la routine priv\'e9e interne void DistancierCalculeR(graf *pgSimple,int bAfficher) qui calcule le distancier du graphe pgSimple \'e0 l'aide de l'algorithme de Floyd et l'affiche si bAfficher.\
+	Appeler le prof pour valider votre travail.\
+\
+\ul Probl\'e8me 2\ulnone \
+	\'c9crire et tester en appelant TP1TESTER(2) depuis le main la routine publique void TP1Distancier(graf *pgG,int bAfficher) qui calcule le distancier de pgG \'e0 l'aide de l'algorithme de Dijkstra avec Tas, et l'affiche si bAfficher.   \
+	Appeler le prof pour valider votre travail.\
+\
+\ul Probl\'e8me 3\ulnone \
+	Afficher par TP1TESTER(3) un tableau comparatif des performances des deux routines pr\'e9c\'e9dentes sur un graphe routier cons\'e9quent et un graphe complet de m\'eame taille (S) qui montre la sup\'e9riorit\'e9 de TP1Distancier() sur DistancierCalculeR() pour les graphes de faible densit\'e9 et donc les graphes routiers qui int\'e9ressent la soci\'e9t\'e9 Home Slip Home.\
+	Appeler le prof pour valider votre travail.\
+\ul \
+\pard\tx560\pardeftab560\qj\pardirnatural
+\cf0 \ulnone \
+\
+\pard\tx560\pardeftab560\qj\pardirnatural
+\cf0 \ul algo de Floyd\ulnone \
+	donn\'e9e: graphe G=(S,A); r\'e9sultat: matrice D des plus courtes distances\
+	N:=nombre de sommets de G\
+	matrice D:=infini partout\
+	diagonale principale de D:=0 partout\
+	matrice P:=0 partout //pour retrouver le plus court chemin; superflu,sinon \
+	rep sX de 1 \'e0 N\
+		P(sX,sX):=0\
+		rep pour tout successeur sY de sX tel que sY \uc0\u8800  sX\
+			D(sX,sY)=poids(sX,sY)\
+			P(sX,sY)=sX\
+	rep K de 1 \'e0 N\
+		rep I de 1 \'e0 N\
+			rep J de 1 \'e0 N\
+				si D(I,J) > D(I,K) + D(K,J)\
+					D(I,J) := D(I,K) + D(K,J)\
+					P(I,J)=P(K,J)\
+\
+\
+\
+\
+******** Appeler le prof \'e0 chaque question avant de passer \'e0 la question suivante. *******\
+Vous enverrez ensuite par mail le fichier TPi.c \'97\'97modalit\'e9s pr\'e9cis\'e9es \'e0 la fin du TP.\
+\pard\tx560\pardeftab560\qc\pardirnatural
+\cf0 .......................}
