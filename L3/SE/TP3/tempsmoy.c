@@ -7,8 +7,15 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
+
+
+/* Constantes */
 
 #define TAILLE_COMMANDE 20
+#define TAILLE_MAX 256
+
+/* Fonctions */
 
 int floatcomp(const void* elem1, const void* elem2)
 {
@@ -23,6 +30,14 @@ float tempsMoyen(float * tab, int n){
 	else return ((tab[n / 2] + tab[(n / 2)- 1]) / 2);
 }
 
+void afficher_tab(float * tab, int n){
+  int i;
+  for(i = 0; i < n; i++){
+    printf("M[%i] = %f\n",i,tab[i]);
+  }
+}
+
+/* Programme principal */
 
 int main(int argc, char * argv[]){
 
@@ -33,10 +48,12 @@ int main(int argc, char * argv[]){
 	int nb_repet, nb_processus;
 	float moyenne;
 	int tube[2];
+  int tube_err[2];
 	float tempsPs;
 	int cr, cr1;
 
 	char commande[TAILLE_COMMANDE];
+  char err_retour[TAILLE_MAX];
 
 	struct timeval t1, t2,res;
 
@@ -54,6 +71,8 @@ int main(int argc, char * argv[]){
 	int fd_devnull = open("/dev/null", O_RDWR);
 
   pipe(tube);
+  pipe(tube_err);
+
 
 	/* Création de nb_processus fils */
 
@@ -67,7 +86,7 @@ int main(int argc, char * argv[]){
 
 							    gettimeofday(&t1,NULL);
 
-    							/* Creation de nb_repet processus sous-fils */
+    							/* Creation de nb_repet processus petit-fils */
 
     							for(j = 0; j < nb_repet; j++){
     								switch(fork()){
@@ -75,22 +94,45 @@ int main(int argc, char * argv[]){
     								  case -1: perror("Erreur fork n°2");
     													 exit(1);
 
-    									case 0:	dup2(fd_devnull,1);
-    													close(fd_devnull);
-    													execlp(commande,commande,NULL);
-                              exit(3);
+    									case 0:	 dup2(fd_devnull,1);
+    													 close(fd_devnull);
+    													 execlp(commande,commande,NULL);
+                               exit(3);
 
 								   }
 							    }
 
-							    while(wait(&cr1) != -1){
-                    if(cr1 > 768){
-                      exit(2);
+                  /* On attend que tous les petit-fils se termine */
+
+                     while(wait(&cr1) != -1){
+
+                      if(cr1 != 0){
+
+                        if(WIFSIGNALED(cr1)){                                     // Cas 1 : interrompu par un signal
+                          char erreur2[TAILLE_MAX];
+                          sprintf(erreur2,"Processus arrêté: Signal n°%i",WTERMSIG(cr1));
+                          write(tube_err[1],erreur2,TAILLE_MAX);
+                          exit(2);
+                        }
+
+                        if(WIFEXITED(cr1)){                                       // Cas 2 : sortie avec exit
+                          char erreur1[TAILLE_MAX];
+
+                          if((WEXITSTATUS(cr1)) == 3)
+                            sprintf(erreur1,"Commande %s innexistante, veuillez réessayer",commande);
+
+                          else{
+                            sprintf(erreur1,"Erreur: code sortie %i",WEXITSTATUS(cr1));
+                          }
+
+                          write(tube_err[1],erreur1,TAILLE_MAX);
+                          exit(3);
+
+
+                        }
+                      }
+
                     }
-                    else if(cr1 != 0){
-                      exit(cr1);
-                    }
-                  }
 
 							    gettimeofday(&t2,NULL);
 
@@ -112,48 +154,46 @@ int main(int argc, char * argv[]){
                            timersub(&t1, &t2, &res);
                    }
 
-    							tempsPs = res.tv_sec + res.tv_usec / nb_repet;
-                  tempsPs = tempsPs / 1000;
+    							tempsPs = (res.tv_sec + res.tv_usec) / nb_repet;
+
+                  /* On ecrit dans le tube le temps moyen qu'a pris le fils à effectuer la commande */
+
     							write(tube[1],&tempsPs,sizeof(float));
-                  close(tube[1]);
                   exit(0);
+
 	 }
- }
+  }
 
-  for(i = 0; (i < nb_processus) && (wait(&cr) != -1); i++){
-    printf("cr = %i\n",cr);
-    if(cr != 0){
-      printf("cr = %i\n",cr);
-      if(cr == 512){
-          printf("Erreur commande inexistante\n");
-      }else if(cr > 128){
-          printf("Erreur cr = %i\n", cr);
-      }else{
-          printf("Interrompu par le signal n° %i",cr);
+
+  /*  Dès que tous les processus fils se termine, on lit dans le tube */
+
+      while(wait(&cr) != -1){
+
+
+        if(cr != 0){
+            read(tube_err[0],err_retour,TAILLE_MAX);
+            printf("%s",err_retour);
+            exit(1);
+        }
+
       }
-      exit(-1);
-    }else{
+
+    for(i = 0; i < nb_processus; i++)
       read(tube[0],&M[i],sizeof(float));
-    }
-  }
 
-  printf("Avant le tri \n");
-  for(i = 0; i < nb_processus; i++){
-    printf("M[%i] = %f\n",i,M[i]);
-  }
 
+  /* Calcul + Affichage */
+
+  printf("Avant le tri: \n");
+  afficher_tab(M,nb_processus);
 	qsort(M,nb_processus,sizeof(float),floatcomp);
-
   printf("\n");
-
-  printf("Apres le tri \n");
-  for(i = 0; i < nb_processus; i++){
-    printf("M[%i] = %f\n",i,M[i]);
-  }
+  printf("Apres le tri: \n");
+  afficher_tab(M,nb_processus);
 
 	moyenne = tempsMoyen(M,nb_processus);
 
-	printf("\n\nEn moyenne la commande '%s' met %f secondes à s'executer\n\n",commande,moyenne);
+	printf("\n\nEn moyenne la commande '%s' met %f microsecondes à s'executer\n\n",commande,moyenne);
 
 
 }
