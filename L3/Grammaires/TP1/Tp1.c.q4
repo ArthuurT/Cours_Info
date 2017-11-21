@@ -71,7 +71,7 @@ int bT(int iDebut, int * piFin){
 		int iFin, iX;
 		int bSucces = bB(iDebut, &iX) && bU(iX, &iFin);
 		*piFin = (bSucces)? iFin:iDebut;
-		return(bSucces);
+		return(bSucces);CD
 }
 
 int bU(int iDebut, int * piFin){
