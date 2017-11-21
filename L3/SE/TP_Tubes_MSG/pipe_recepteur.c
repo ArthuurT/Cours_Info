@@ -40,10 +40,13 @@ main( int nb_arg , char * tab_arg[])
 	     exit(-1);
      }
 
+     /* Creation du tube (ne fait rien si déja créé) */
+
      mknod(nom_tube, S_IFIFO | 0666, 0);
 
      if((fd_tube = open(nom_tube,O_RDONLY,0)) == -1){
        perror("Erreur : ouverture du tube nommé en lecture impossible");
+       exit(-2);
      }
 
      printf("Ouverture du tube nommé en lecture réussi\n");
@@ -56,6 +59,7 @@ main( int nb_arg , char * tab_arg[])
          close(fd_tube);
          if((fd_tube = open(nom_tube,O_WRONLY,0)) == -1){
            perror("Erreur : ouverture du tube nommé en écriture impossible");
+           exit(-3);
          }
          printf("Ouverture du tube nommé en écriture réussi\n");
          printf("Ecriture d'un message ...\n\n");

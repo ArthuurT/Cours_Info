@@ -39,6 +39,7 @@ main( int nb_arg , char * tab_arg[])
 
      if((fd_tube = open(nom_tube,O_WRONLY,0)) == -1){
        perror("Erreur : ouverture du tube nommé en écriture impossible");
+       exit(-3);
      }
 
      printf("Ouverture du tube nommé en écriture réussi\n");
@@ -57,6 +58,7 @@ main( int nb_arg , char * tab_arg[])
 
      if((fd_tube = open(nom_tube,O_RDONLY,0)) == -1){
        perror("Erreur : ouverture du tube nommé en lecture impossible");
+       exit(-2);
      }
 
      printf("Ouverture du tube nommé en lecture réussi\n");
