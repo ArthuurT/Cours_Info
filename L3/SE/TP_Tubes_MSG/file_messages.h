@@ -10,11 +10,17 @@
 
 #define MSG_TYPE_RECEPTEUR 22
 
+
 /* Structure message */
+
+typedef struct premier_message{
+  int pid;
+  char message[MESSAGES_TAILLE+1];
+}premier_message_t;
 
 
 /*
- * Definition des fonctions 
+ * Definition des fonctions
  */
 
 /* Affichage d'un message */

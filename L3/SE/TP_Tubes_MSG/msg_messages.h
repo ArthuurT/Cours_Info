@@ -12,7 +12,7 @@
 typedef struct corps
 {
   int pid;
-  char buffer[MESSAGES_TAILLE];
+  char buffer[MESSAGES_TAILLE+1];
 } corps_t ;
 
 typedef struct message

@@ -36,6 +36,8 @@ main( int nb_arg , char * tab_arg[] )
      size_t lg = sizeof(corps_reponse_t);
 
      cle_file = msgget(CLE_BAL, IPC_CREAT | 0666);
+     printf("cle = %i\n",cle_file);
+     printf("boite ouverte\n");
 
      /* Recuperation des MESSAGES_NB messages */
 

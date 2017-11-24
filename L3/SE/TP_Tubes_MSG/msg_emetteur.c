@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <errno.h>
 
 #include <msg_messages.h>
 
@@ -11,6 +12,7 @@ int
 main( int nb_arg , char * tab_arg[] )
 {
      char nomprog[128] ;
+     int erreur;
 
      /*-----*/
 
@@ -39,13 +41,15 @@ main( int nb_arg , char * tab_arg[] )
      msg_remplir(&requete,car);
 
      cle_file = msgget(CLE_BAL,0666);
+     printf("cle = %i\n",cle_file);
      gettimeofday(&date_envoi,NULL);
      temps_t1 = date_envoi.tv_sec + (date_envoi.tv_usec/1000000.0);
 
      /* Envoi des MESSAGES_NB messages à la suite */
 
      while(compteur < MESSAGES_NB){
-       msgsnd(cle_file,&requete,sizeof(corps_t),0);
+       if(msgsnd(cle_file,&requete,sizeof(corps_t),0) == -1)
+       printf("%s\n",strerror(errno));
        compteur++;
      }
 
