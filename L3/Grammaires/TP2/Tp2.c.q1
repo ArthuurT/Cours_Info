@@ -1,0 +1,161 @@
+#include "Outil.h"
+#include "Tp1.h"
+
+//Exercice 1
+// L1 = b(b*a+a*b)
+
+	// L1 = bb*a + ba*b
+	// L1 = (b+)a + b(1 + (a+))b
+	// L1 = (b+)a + (b+b(a+))b
+	// L1 = (b+)a	+ bb + b(a+)b
+
+	/**************/
+
+	// S -> U + V + Z (TD)
+
+	// U -> Ca
+	// V -> bb
+	// Z -> bDb
+
+	// C -> bC + b
+	// D -> aD + a
+
+	/***************/
+
+	// S -> U	+ V + Z (TP)
+
+	// U -> C.A
+	// V -> B.B
+	// Z -> B.D.B
+
+	// C -> N + B
+	// D -> M + A
+
+	// N -> B.C
+	// M -> A.D
+
+	// A -> a
+	// B -> b
+
+
+
+
+char * sMOT;
+
+int bA(int iDebut, int * piFin);
+int bB(int iDebut, int * piFin);
+int bC(int iDebut, int * piFin);
+int bD(int iDebut, int * piFin);
+int bU(int iDebut, int * piFin);
+int bV(int iDebut, int * piFin);
+int bZ(int iDebut, int * piFin);
+int bN(int iDebut, int * piFin);
+int bM(int iDebut, int * piFin);
+int bS(int iDebut, int * piFin);
+
+int bTp1AmorceR = kF;
+
+void Tp1AMORCER(){
+	bTp1AmorceR = kV;
+}
+
+void Tp1INITIALISER(){
+	Assert1("Tp1INITIALISER", bTp1AmorceR);
+}
+
+int bA(int iDebut, int * piFin){
+		//A->a
+		int bSucces = sMOT[iDebut] == 'a';
+		*piFin = (bSucces)? iDebut+1 : iDebut;
+		return(bSucces);
+}
+
+int bB(int iDebut, int * piFin){
+		//B-> b
+		int bSucces = sMOT[iDebut] == 'b';
+		*piFin = (bSucces)? iDebut+1 : iDebut;
+		return(bSucces);
+}
+
+int bU(int iDebut, int * piFin){
+		//U-> C.A
+		int iFin, iX;
+		int bSucces = bC(iDebut, &iX) && bA(iX, &iFin);
+		*piFin = (bSucces)? iFin:iDebut;
+		return(bSucces);
+}
+
+int bV(int iDebut, int * piFin){
+		//V-> B.B
+		int iFin, iX;
+		int bSucces = bB(iDebut, &iX) && bB(iX, &iFin);
+		*piFin = (bSucces)? iFin:iDebut;
+		return(bSucces);
+}
+
+int bZ(int iDebut, int * piFin){
+		//Z-> B.D.B
+		int iFin, iX, iY;
+		int bSucces = bB(iDebut, &iX) && bD(iX, &iY) && bB(iY, &iFin);
+		*piFin = (bSucces)? iFin:iDebut;
+		return(bSucces);
+}
+
+int bC(int iDebut, int * piFin){
+		//C-> N + B
+		int iFin, iX;
+		int bSucces = bN(iDebut, &iFin) || bB(iDebut, &iFin);
+		*piFin = (bSucces)? iFin:iDebut;
+		return(bSucces);
+}
+
+int bD(int iDebut, int * piFin){
+		//D-> M + A
+		int iFin, iX;
+		int bSucces = bM(iDebut, &iFin) || bA(iDebut, &iFin);
+		*piFin = (bSucces)? iFin:iDebut;
+		return(bSucces);
+}
+
+int bN(int iDebut, int * piFin){
+		//N-> B.C
+		int iFin, iX;
+		int bSucces = bB(iDebut, &iX) && bC(iX, &iFin);
+		*piFin = (bSucces)? iFin:iDebut;
+		return(bSucces);
+}
+
+int bM(int iDebut, int * piFin){
+		//M-> A.D
+		int iFin, iX;
+		int bSucces = bA(iDebut, &iX) && bD(iX, &iFin);
+		*piFin = (bSucces)? iFin:iDebut;
+		return(bSucces);
+}
+
+int bS(int iDebut, int * piFin){
+		//S-> Z + V + U
+		int iFin;
+		int bSucces = bZ(iDebut, &iFin) || bU(iDebut,&iFin) || bV(iDebut,&iFin);
+		*piFin = (bSucces)? iFin:iDebut;
+		return(bSucces);
+}
+
+
+void Tp1TESTER(int iTest){
+	int bEngendre, iFin, bSucces;
+	Assert1("Tp1TESTER0",bTp1AmorceR);
+	switch(iTest){
+			case 1: sMOT = "bb"; break;
+			case 2: sMOT = "aaba"; break;
+			case 3: sMOT = "bba"; break;
+			case 4: sMOT = "bbbbba"; break;
+			case 5: sMOT = "ba"; break;
+			case 6: sMOT = "baab"; break;
+			case 7: sMOT = "bab"; break;
+			default: Assert1("Tp1TESTER1",0); break;
+	}
+	bSucces = bS(0,&iFin);
+	bEngendre = bSucces && nChaineLg(sMOT) == iFin;
+	printf("%s: %s %s engendré par la grammaire décrite dans \"Grammaire.c\".\n",(bEngendre)? "SUCCES" : "ECHEC", sG(sMOT), sEst(bEngendre));
+}
