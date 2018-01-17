@@ -1,0 +1,128 @@
+#include "Outil.h"
+#include "Tp1.h"
+#include "math.h"
+
+//Exercice 1
+// L1 = (a+b		,n  est un carré non nul
+// L'1 = (b^n).(a^n)		,n > 0
+
+	/************** (TD) */
+
+	// S -> T
+	// T -> bTa + ab
+
+	/*************** (TP) */
+
+	// S -> T
+	// T -> U + W
+	// U -> B.T.A
+	// W -> B.A
+	// A -> a
+	// B -> b
+
+	/************** (TP attribué) */
+
+	// S -> T(n).(n est un carré non nul)
+	// T(n) -> U(n) + W(n)
+	// U(n+1) -> B.T(n).A
+	// W(1) -> B.A
+	// A -> a
+	// B -> b
+
+
+
+
+char * sMOT;
+
+int bA(int iDebut, int * piFin);
+int bB(int iDebut, int * piFin);
+int bU(int iDebut, int * piFin, int * paU);
+int bW(int iDebut, int * piFin, int * paW);
+int bT(int iDebut, int * piFin, int * paT);
+int bS(int iDebut, int * piFin);
+
+
+int bTp1AmorceR = kF;
+
+void Tp1AMORCER(){
+	bTp1AmorceR = kV;
+}
+
+void Tp1INITIALISER(){
+	Assert1("Tp1INITIALISER", bTp1AmorceR);
+}
+
+int estCarre(int x){
+	double r1 = sqrt(x);
+	int r2 = r1;
+	return (r2 == r1);
+}
+
+
+
+int bA(int iDebut, int * piFin){
+		// A -> a
+		int bSucces = sMOT[iDebut] == 'a';
+		*piFin = (bSucces)? iDebut+1 : iDebut;
+		return(bSucces);
+}
+
+int bB(int iDebut, int * piFin){
+		// B -> b
+		int bSucces = sMOT[iDebut] == 'b';
+		*piFin = (bSucces)? iDebut+1 : iDebut;
+		return(bSucces);
+}
+
+int bU(int iDebut, int * piFin, int * paU){
+		// U(n+1) -> B.T(n).A
+		int iFin, iX, iY, paT;
+		int bSucces = bB(iDebut, &iX) && bT(iX, &iY, &paT) && bA(iY, &iFin)  ;
+		*piFin = (bSucces)? iFin:iDebut;
+		if(bSucces) *paU = paT + 1;
+		return(bSucces);
+}
+
+
+int bW(int iDebut, int * piFin, int * paW){
+		// W(1) -> B.A
+		int iFin, iX;
+		int bSucces = bB(iDebut, &iX) && bA(iX, &iFin);
+		*piFin = (bSucces)? iFin:iDebut;
+		if(bSucces) *paW = 1;
+		return(bSucces);
+}
+
+int bT(int iDebut, int * piFin, int * paT){
+		// T(n) -> U(n) + W(n)
+		int iFin;
+		int bSucces = bU(iDebut, &iFin, paT) || bW(iDebut, &iFin, paT);
+		*piFin = (bSucces)? iFin:iDebut;
+		return(bSucces);
+}
+
+int bS(int iDebut, int * piFin){
+		// S -> T(n).(n est un carré non nul)
+		int iFin, paT;
+		int bSucces = bT(iDebut, &iFin, &paT) && (estCarre(paT));
+		*piFin = (bSucces)? iFin:iDebut;
+		return(bSucces);
+}
+
+void Tp1TESTER(int iTest){
+	int bEngendre, iFin, bSucces;
+	Assert1("Tp1TESTER0",bTp1AmorceR);
+	switch(iTest){
+			case 1: sMOT = "bbbbbbbbbaaaaaaaaa"; break;
+			case 2: sMOT = "bbbbaaaa"; break;
+			case 3: sMOT = "ba"; break;
+			case 4: sMOT = "bbaa"; break;
+			case 5: sMOT = "bbbaaa"; break;
+			case 6: sMOT = "bab"; break;
+			case 7: sMOT = "bbbbbaaaaa"; break;
+			default: Assert1("Tp1TESTER1",0); break;
+	}
+	bSucces = bS(0,&iFin);
+	bEngendre = bSucces && nChaineLg(sMOT) == iFin;
+	printf("%s: %s %s engendré par la grammaire décrite dans \"Grammaire.c\".\n",(bEngendre)? "SUCCES" : "ECHEC", sG(sMOT), sEst(bEngendre));
+}

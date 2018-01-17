@@ -65,14 +65,11 @@ void tobin(int valeur, int digit, int nombre[])
 }
 
 
-void fabriqueMot(int valeur, int taille_max, char mot[]){
+void fabriqueMot(){
 	int i;
-	int nombre[taille_max];
-	tobin(156,taille_max,nombre);
-	for(i = 0 ; i < taille_max; i++){
-		if(nombre[i] == 1) mot[i] == 'a';
-		else mot[i] == 'b';
-	}
+	int nombre[8];
+	tobin(156,8,nombre);
+	for(i = 0; i < 8; i++) printf("%i ",nombre[i]);
 }
 
 
