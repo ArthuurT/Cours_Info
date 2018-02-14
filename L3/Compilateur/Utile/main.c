@@ -30,7 +30,7 @@ void ModuleAmorceR(){
 		//GaussAMORCER();
 		//NbAMORCER();
 		//TasAMORCER();
-		//TdsAMORCER();
+		TdsAMORCER();
 		//TicketAMORCER();
 		//Tp1AMORCER();
 		//Tp2AMORCER();
@@ -48,21 +48,21 @@ void Compiler(int nSource){
 	char *sSource;
 	//nSource=2;
 	switch (nSource){
-		case 1: sSource="51 Trac;$";
+		case 1: sSource="19.60 livre; 8.05 autrelivre; 7.02 encoreautrelivre;$";break;
 		// case 1: sSource="51.0 trac; 52 Trec ; 53.0 tric ; 54.0 troc ; Bidule ; Chose ; 0.0 machin ; 55.0 truc;$";
-				break;
-		case 2: sSource="240317 ELLE; 0.5 elle; < elle ELLE; 0 elle; < elle ELLE; > elle ELLE ; 440317 MOI  ; 3.5 machin ; 55 Truc ;$";
-				break;
-		case 3: sSource="240317 ELLE; 0.5 dune; < dune ELLE; 0 dune; < dune ELLE; > dune ELLE ; 440317 MOI  ; 3.5 machin ; 55 Truc ;$";
-				break;
+				//break;
+		//case 2: sSource="240317 ELLE; 0.5 elle; < elle ELLE; 0 elle; < elle ELLE; > elle ELLE ; 440317 MOI  ; 3.5 machin ; 55 Truc ;$";
+				//break;
+		//case 3: sSource="240317 ELLE; 0.5 dune; < dune ELLE; 0 dune; < dune ELLE; > dune ELLE ; 440317 MOI  ; 3.5 machin ; 55 Truc ;$";
+				//break;
 		default: ;
 	}
 	bSucces=bAlexAnalyser(sSource); DiagnostiqueR("lexicale",bSucces);
 	bSucces=bSucces && bAsyntAnalyser(mAsyntSyntaxe); DiagnostiqueR("syntaxique",bSucces);
-	//bSucces=bSucces && bAsyntAnalyser(mAsyntSemantique); //DiagnostiqueR("sémantique",bSucces);
+	bSucces=bSucces && bAsyntAnalyser(mAsyntSemantique); DiagnostiqueR("sémantique",bSucces);
+	bSucces = bSucces && bAsyntAnalyser(mAsyntGenerer);
 	//ErreurAfficherTout();
-	printf("%s",bSucces? "OK\n":"KO\n");
-	AlexAfficher();
+	//AlexAfficher();
 }//Compiler
 
 void MacroTesteR() {

@@ -1,4 +1,4 @@
-enum eAsyntMode {mAsyntSyntaxe,mAsyntSemantique};
+enum eAsyntMode {mAsyntSyntaxe,mAsyntSemantique,mAsyntGenerer};
 void AsyntAMORCER();
 int bAsyntAnalyser(int amMode);
 void AsyntDenoncer();

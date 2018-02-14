@@ -9,12 +9,12 @@ int nTdsVoiR;//dédié TdsVoir();nombre courant d'appels de la routine TDdsVoir(
 //#define kuItemLiM 131071 //2**17-1
 #define kcTdsMaX 'Z'
 #define kuItemMaX (kuItemLiM-1)
-#define kuSymboleLiM 20 
+#define kuSymboleLiM 20
 #define kuSymboleMax (kuSymboleLiM-1) //nombre total de symboles qui discrimine les identificateurs.
 char cTdsAlloueR[1+kcTdsMaX];
 //la TDS est un tableau de kuItemLiM items indexée dans [0..kuItemMaX]:
 	struct item{
-		char ident[kuSymboleLiM]; 
+		char ident[kuSymboleLiM];
 		char cNom;//nom de la Tds
 		int val;//valeur associée à l'identificateur
 		int filler;
@@ -58,13 +58,25 @@ int bItemVidE(int nItem){
 int bTdsAllouer(int bAllouer,char* pcTdsNom){
 	// rend le nom d'une TDS disponible, ou rend '0' si échec
 	char cTds;
-	int bTdsAllouer;
+	int bTdsAllouer = kV;
 	*pcTdsNom='0';
-	for (bTdsAllouer=kF,cTds='A';cTds<=kcTdsMaX;cTds++)
-		if (cTdsAlloueR[cTds]=='0'){
-			*pcTdsNom=cTds;
-			bTdsAllouer=kV;
-		}
+
+
+			if(bAllouer){
+				for (bTdsAllouer=kF,cTds='A';cTds<=kcTdsMaX;cTds++)
+					if (cTdsAlloueR[cTds]=='0'){
+						*pcTdsNom=cTds;
+						bTdsAllouer=kV;
+					}
+
+			}else{
+					cTdsAlloueR[*pcTdsNom] = '0';
+					for(int i = 0; i < kuItemLiM; i++){
+						if(TDS[i].cNom = *pcTdsNom)
+							TDS[i].cNom = '\0';
+					}
+			}
+
 	return(bTdsAllouer);
 }//bTdsAllouer
 
@@ -75,6 +87,7 @@ int bTdsAjouter(char cTdsNom,char *sIdentificateur){
 	int bAjouter=!bTdsContient(cTdsNom,sIdentificateur,&nPlace);
 	if (bAjouter){
 		//te("nPlace",nPlace);
+		TDS[nPlace].cNom = cTdsNom;
 		strcpy(TDS[nPlace].ident,sIdentificateur);
 		TDS[nPlace].val=0;
 	}
@@ -119,7 +132,7 @@ void TdsAMORCER(){
 }//TdsAMORCER
 
 int bTdsContient(char cTdsNom,char *sIdentificateur,int *pnItem){//O(1)
-	//vrai ssi sIdentificateur est en TDS. Si oui, *pnItem donne son emplacement;sinon, *pnItem indexe un item vide. 
+	//vrai ssi sIdentificateur est en TDS. Si oui, *pnItem donne son emplacement;sinon, *pnItem indexe un item vide.
 	int bContient;
 	int bEureka,bPartir;
 	Assert2("bTdsContient0",bTdsAmorceR,nChaineLg(sIdentificateur)>0);
@@ -200,7 +213,7 @@ void TdsTESTER(int iTest){
 			break;
 	}
 	Appel1(sC2("TdsTESTER,test n°",sEnt(iTest)));
-}//TdsTESTER	
+}//TdsTESTER
 
 void TdsValuer(char cTdsNom,int nItem,int iValeur){
 	Assert1("TdsValuer",bCroit(0,nItem,kuItemMaX));
@@ -220,4 +233,3 @@ void TdsVoir(char cTdsNom,char *sMessage){//O(nCardMaX)
 			Pause();
 	}
 }//TdsVoir
-

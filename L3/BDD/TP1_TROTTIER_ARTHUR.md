@@ -1,6 +1,12 @@
 ## SEANCE 1 - Plateforme de jeu en ligne
 #### TROTTIER Arthur - L3 SPI
 
+## Connexion à la DATABASE
+
+```
+psql --username=u_l3info031 --dbname=bd_l3info031
+```
+
 ## Implémentation
 
 1. Création de la base

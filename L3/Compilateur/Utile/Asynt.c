@@ -5,22 +5,17 @@
 #include "Tds.h"
 //Grammaire algébrique LL(1):
 	//Programme->Instructions || FinFichier
-	//		Instructions->Instruction PointVirgule Programme
+	//		Instructions->Instruction Programme
 	//Instruction->Emprunt || Reservation || Achat || Restitution || Radiation || Autre
-	//		Emprunt->"<" LivreOuListeDeLivre Nom 						Liste de livre : (Livre1 Livre2 ... LivreN)
-	//		Reservation->"?" Livre Nom 											Livre répertorié et Nom en TDS
-	//		Achat->Prix	Livre 															réel>0 et Livre non encore répertorié
-	//		Restitution->">" Livre Nom											Livre répertorié et Nom en TDS
-	//		Radiation->Nom  																Nom en TDS
-	//		Autre->Entier Suite															Entier est une durée>0 pr une Interdiction et une date pr une inscription
+	//		Emprunt->"<" Livre Nom			  Livre répertorié et Nom en TDS
+	//		Reservation->"?" Livre Nom		  Livre répertorié et Nom en TDS
+	//		Achat->Prix Livre PointVirgule    réel>0 et Livre non encore répertorié
+	//		Restitution->">" Livre Nom		  Livre répertorié et Nom en TDS
+	//		Radiation->Nom PointVirgule       Nom en TDS
+	//		Autre->Entier Suite				  Entier est une durée>0 pr une Interdiction et une date pr une inscription
 	//Suite->Interdiction || Inscription
-	//		Interdiction->Livre	 														Livre répertorié
-	//		Inscription->Nom 																Nom hors TDS
-	//LivreOuListeDeLivre -> Livre || ListeDeLivre
-	//		ListeDeLivre -> "(" && Liste
-	//		Liste -> Livre && Suite
-	//		Suite -> ")" || Liste
-
+	//		Interdiction->Livre PointVirgule  Livre répertorié
+	//		Inscription->Nom				  Nom hors TDS
 enum  eGrammaireRegle {grAlpha,grProgramme,grInstructions,grInstruction,grEmprunt,grReservation,grAchat,grRestitution,grRadiation,grAutre,grSuite,grInterdiction,grInscription,grOmega};
 char *sGrammaireReglE="grAlpha,grProgramme,grInstructions,grInstruction,grEmprunt,grReservation,grAchat,grRestitution,grRadiation,grAutre,grSuite,grInterdiction,grInscription,grOmega";
 
@@ -30,6 +25,7 @@ int nAPPEL;//nombre total d'appels associés aux règles terminales de la gramma
 int bAsyntAmorceR;
 int mAsyntAnalyseR;
 int bkEclaireuR;
+int genmode;
 char cNoM;
 
 void ErreR(int eErreurNumero,int iDebut);
@@ -46,11 +42,8 @@ int bInstructionS(int iDebut,int *piFin);
 int bInterdictioN(int iDebut,int *piFin);
 int bInterrogatioN(int iDebut,int *piFin);
 int bLivrE(int iDebut,int *piFin);
-int bLivreOuListeDeLivrE(int iDebut, int * piFin);
-int bListeDeLivre(int iDebut, int *piFin);
 int bNoM(int iDebut,int *piFin);
 int bOperateuR(char cOperateur,int iDebut,int *piFin);
-int bParenthese(char cParenthese,int iDebut,int *piFin);
 int bPriX(int iDebut,int *piFin);
 int bProgrammE(int iDebut,int *piFin);
 int bRadiatioN(int iDebut,int *piFin);
@@ -59,8 +52,6 @@ int bReservatioN(int iDebut,int *piFin);
 int bRestitutioN(int iDebut,int *piFin);
 int bSeparateuR(int iDebut,int *piFin);
 int bSuitE(int iDebut,int *piFin);
-int bSuiteDeLivrE(int iDebut, int * piFin);
-int bAlexParenthese(int uLexeme, char cParenthese);
 int bSuperieurStricT(int iDebut,int *piFin);
 int bTextE(int iDebut,int *piFin);
 
@@ -77,15 +68,61 @@ void ErrerSouS(int bSucces,int eErreurNumero,int iDebut){
 		ErreR(eErreurNumero,iDebut);
 }//ErrerSouS
 
+
+void GeneraionCommencer(){
+	if(genmode == 1){
+		printf("EMP 0\n");
+	}
+}
+
+void GenerationIterer(char * prix){
+	if(genmode == 1){
+		printf("EMP %s\n",prix);
+		printf("ADR\n");
+	}
+}
+
+void GenerationLePlusLu(){
+
+}
+
+void GenerationPrixTotal(){
+
+}
+
+void GeneraionTitreLivres(){
+
+}
+
+void GenerationTerminer(){
+	if(genmode == 1){
+		printf("EMP 40\n");
+		printf("STO\n");
+	}
+}
+
+
 int bAchaT(int iDebut,int *piFin){
 	//Achat->Prix Livre
 	int bAjouter,bSucces,iFin,iMilieu,nItem;
 	char *sLivre;
+	char *sPrix;
 	//Appel0("bAchaT");
 		bSucces=bPriX(iDebut,&iMilieu) && bLivrE(iMilieu,&iFin);
 		*piFin=(bSucces)? iFin:iDebut;
 		if (bSucces && mAsyntAnalyseR==mAsyntSemantique){
 			sLivre=sAlexChaine(iMilieu);
+			bAjouter=bTdsAjouter(cNoM,sLivre);
+			Assert1("bAchaT",bAjouter);
+			if ( bTdsContient(cNoM,sLivre,&nItem) )
+				TdsValuer(cNoM,nItem,0);//indique que ce livre est disponible.
+
+		}
+
+		if (bSucces && mAsyntAnalyseR==mAsyntGenerer){
+			sLivre=sAlexChaine(iMilieu);
+			sPrix=sAlexChaine(iDebut);
+			GenerationIterer(sPrix);
 			bAjouter=bTdsAjouter(cNoM,sLivre);
 			Assert1("bAchaT",bAjouter);
 			if ( bTdsContient(cNoM,sLivre,&nItem) )
@@ -107,20 +144,47 @@ int bAsyntAnalyser(int amMode){
 	int bAnalyser;
 	int iFin;
 	//Appel0(sC2b("bAsyntAnalyser en mode analyse",sChoix(mAsyntAnalyseR==amMode,"syntaxique","sémantique")));
-		bkEclaireuR=kF;
+		bkEclaireuR=kV;
 		mAsyntAnalyseR=amMode;
-		if (mAsyntAnalyseR==mAsyntSyntaxe){
-			bAnalyser=1 || bTdsAllouer(kV,&cNoM);
-			bAnalyser=bAnalyser && bProgrammE(1,&iFin) && (nErreurEnTout()==0);
-			te("Appels de règles",nAPPEL);
+
+		if(mAsyntAnalyseR==mAsyntSyntaxe){
+			bAnalyser= bProgrammE(1,&iFin) && (nErreurEnTout()==0);
+		}
+
+
+		else if (mAsyntAnalyseR==mAsyntSemantique){
+			bAnalyser=bTdsAllouer(kV,&cNoM);
+			bAnalyser=bProgrammE(1,&iFin) && (nErreurEnTout()==0);
+			//te("Appels de règles",nAPPEL);
 			if (bAnalyser && mAsyntAnalyseR==mAsyntSemantique){
 				TdsVoir(cNoM,"TDS après analyse sémantique");
-			bBof=bTdsAllouer(kF,&cNoM);
-			}else if(bAnalyser && mAsyntAnalyseR==mAsyntSyntaxe){
-				bProgrammE(1,&iFin) && (nErreurEnTout()==0);
-				printf("Nombre d'appel = %i",nAPPEL);
 			}
+			bBof=bTdsAllouer(kF,&cNoM);
 		}
+
+
+		else if(mAsyntAnalyseR==mAsyntGenerer){
+
+			int choix;
+			printf("Choisir un code à générer: \n");
+			printf("1: prix total des livres\n");
+			printf("2: titres des livres\n");
+			printf("3: livre le plus lu\n");
+			printf("Votre choix: ");
+			scanf("%i",&choix);
+
+			genmode = choix;
+
+			bAnalyser=bTdsAllouer(kV,&cNoM);
+			TdsVoir(cNoM,"après génération");
+			GeneraionCommencer();
+			bAnalyser=bProgrammE(1,&iFin) && (nErreurEnTout()==0);
+			GenerationTerminer();
+			bAnalyser=bTdsAllouer(kF,&cNoM);
+		}
+
+
+
 	//Appel1(sC2b("bAsyntAnalyser en mode analyse",sChoix(mAsyntAnalyseR==amMode,"syntaxique","sémantique")));
 	return(bAnalyser);
 }//bAsyntAnalyser
@@ -150,7 +214,7 @@ int bAutrE(int iDebut,int *piFin){
 	//Autre->Entier Suite
 	int bSucces,iFin;
 	//Appel0("bAutrE");
-		bSucces=bAlexEntier(iDebut) && m1 && bSuitE(iDebut+1,&iFin);
+		bSucces=bAlexEntier(iDebut) && bSuitE(iDebut+1,&iFin);
 		*piFin=(bSucces)? iFin:iDebut;
 		nAPPEL++;
 	//Appel1("bAutrE");
@@ -174,7 +238,7 @@ int bEmprunT(int iDebut,int *piFin){
 	int bConnu,bEmprunteurInscrit,iValeur,bSucces,iFin,iMilieu,iSuivant,nItem;
 	char *sLivre;
 	//Appel0("bEmprunT");
-		bSucces=bInferieurStricT(iDebut,&iMilieu) && bLivreOuListeDeLivrE(iMilieu,&iSuivant) && bNoM(iSuivant,&iFin);
+		bSucces=bInferieurStricT(iDebut,&iMilieu) && bLivrE(iMilieu,&iSuivant) && bNoM(iSuivant,&iFin);
 		if (bSucces && mAsyntAnalyseR==mAsyntSemantique){//Livre répertorié et Nom inscrit
 			//TdsVoir("avant emprunt");
 				sLivre=sAlexChaine(iMilieu);
@@ -290,9 +354,7 @@ int bInstructioN(int iDebut,int *piFin){
 			case  6:	bSucces=bAutrE(iDebut,&iFin);break;
 			default:	ErreR(eSyntInstruction,iDebut);break;
 		}
-	}
-	else bSucces=bEmprunT(iDebut,&iFin) || bReservatioN(iDebut,&iFin) || bAchaT(iDebut,&iFin) || bRestitutioN(iDebut,&iFin) || bRadiatioN(iDebut,&iFin) || bAutrE(iDebut,&iFin);
-	if (bSucces) m4;
+	}else bSucces=bEmprunT(iDebut,&iFin) || bReservatioN(iDebut,&iFin) || bAchaT(iDebut,&iFin) || bRestitutioN(iDebut,&iFin) || bRadiatioN(iDebut,&iFin) || bAutrE(iDebut,&iFin);
 	*piFin=(bSucces)? iFin:iDebut;
 	Assert1("bInstructioN1",*piFin>0);
 	nAPPEL++;
@@ -339,24 +401,6 @@ int bInterrogatioN(int iDebut,int *piFin){
 	return(bSucces);
 }//bInterrogatioN
 
-int bListe(int iDebut, int *piFin){
-	// Liste -> Livre && Suite
-	int bSucces,iFin,iSuivant;
-	bSucces = bLivrE(iDebut,&iSuivant) && bSuiteDeLivrE(iSuivant,&iFin);
-	*piFin = (bSucces)? iFin:iDebut;
-	nAPPEL++;
-	return bSucces;
-}
-
-int bListeDeLivre(int iDebut, int *piFin){
-	//ListeDeLivre -> "(" && Liste
-	int bSucces,iFin, iSuivant;
-	bSucces = bParenthese('(',iDebut,&iSuivant) && bListe(iSuivant,&iFin);
-	*piFin = (bSucces)? iFin:iDebut;
-	nAPPEL++;
-	return bSucces;
-}
-
 int bLivrE(int iDebut,int *piFin){
 	//Livre->Texte
 	int bSucces,iFin;
@@ -368,15 +412,6 @@ int bLivrE(int iDebut,int *piFin){
 	ErrerSouS(bSucces,eSyntLivre,iDebut);
 	return(bSucces);
 }//bLivrE
-
-int bLivreOuListeDeLivrE(int iDebut, int * piFin){
-	//LivreOuListeDeLivre -> Livre || ListeDeLivre
-	int bSucces,iFin;
-	bSucces = bLivrE(iDebut,&iFin) || bListeDeLivre(iDebut,&iFin);
-	*piFin = (bSucces)? iFin:iDebut;
-	nAPPEL++;
-	return (bSucces);
-}
 
 int bNoM(int iDebut,int *piFin){
 	//Nom->Identificateur
@@ -395,17 +430,6 @@ int bOperateuR(char cOperateur,int iDebut,int *piFin){
 	int bSucces;
 	//Appel0("bOperateuR");
 		bSucces=bAlexOperateur(iDebut,cOperateur);
-		*piFin=(bSucces)? iDebut+1:iDebut;
-		nAPPEL++;
-	//Appel1("bOperateuR");
-	return(bSucces);
-}//bOperateuR
-
-int bParenthese(char cParenthese,int iDebut,int *piFin){
-	//Operateur->cOperateur
-	int bSucces;
-	//Appel0("bOperateuR");
-		bSucces=bAlexParenthese(iDebut,cParenthese);
 		*piFin=(bSucces)? iDebut+1:iDebut;
 		nAPPEL++;
 	//Appel1("bOperateuR");
@@ -545,7 +569,7 @@ int bSuitE(int iDebut,int *piFin){
 		nChoix2=nAlexSuite(iDebut);//pré-vision instruction courante: 1 si Interdiction, 2 si Inscription, et 0 si échec.
 		if (bEclaireR) tee("iDebut et nChoix2 pr bSuitE",iDebut,nChoix2);
 		switch(nChoix2){
-			case 1: bSucces=bInterdictioN(iDebut,&iFin);break;
+			case 1:	bSucces=bInterdictioN(iDebut,&iFin);break;
 			case 2:	bSucces=bInscriptioN(iDebut,&iFin);break;
 			default:ErreR(eSyntSuite,iDebut);break;
 		};
@@ -556,15 +580,6 @@ int bSuitE(int iDebut,int *piFin){
 	nAPPEL++;
 	return(bSucces);
 }//bSuitE
-
-int bSuiteDeLivrE(int iDebut, int * piFin){
-	//Suite -> ")" || Liste
-	int bSucces,iFin;
-	bSucces = bParenthese(')',iDebut,&iFin) || bListe(iDebut,&iFin);
-	*piFin = (bSucces)? iFin:iDebut;
-	nAPPEL++;
-	return (bSucces);
-}
 
 int bSuperieurStricT(int iDebut,int *piFin){
 	int bSucces;
