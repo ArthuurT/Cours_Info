@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PROJET NOM="MondeDesGlarks" TYPE="Java">
+  <FICHIER>Jeu.java</FICHIER>
+  <FICHIER>Damier.java</FICHIER>
+  <FICHIER>Case.java</FICHIER>
+  <FICHIER>CaseObstacle.java</FICHIER>
+  <FICHIER>CaseLibre.java</FICHIER>
+  <FICHIER>Direction.java</FICHIER>
+  <FICHIER>Glark.java</FICHIER>
+  <FICHIER>Borne.java</FICHIER>
+  <FICHIER>Sens.java</FICHIER>
+  <FICHIER>Glouton.java</FICHIER>
+  <FICHIER>Pirate.java</FICHIER>
+  <FICHIER>Test.java</FICHIER>
+</PROJET>
+

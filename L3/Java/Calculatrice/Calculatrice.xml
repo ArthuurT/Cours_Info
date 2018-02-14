@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PROJET NOM="Calculatrice" TYPE="Java">
+  <FICHIER>UniteCentrale.java</FICHIER>
+  <FICHIER>Touche.java</FICHIER>
+  <FICHIER>Operateur.java</FICHIER>
+  <FICHIER>OperateurBin.java</FICHIER>
+  <FICHIER>OperateurUna.java</FICHIER>
+  <FICHIER>FunctionBin.java</FICHIER>
+  <FICHIER>FunctionUna.java</FICHIER>
+  <FICHIER>Entrer.java</FICHIER>
+  <FICHIER>Test.java</FICHIER>
+  <FICHIER>Digit.java</FICHIER>
+</PROJET>
+

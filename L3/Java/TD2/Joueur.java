@@ -67,6 +67,7 @@ public class Joueur{
 
 	private void modifierPosition(){
 		int numeroDe = jeu.lancerDe();
+		System.out.println("Dé:" + numeroDe + ", valeur déplacement: " + stratJoueur.calculeScore(numeroDe));
 		this.posJoueur = this.posJoueur + stratJoueur.calculeScore(numeroDe);
 		this.dureeStrat--;
 	}
@@ -75,7 +76,7 @@ public class Joueur{
 		if(this.dureeStrat == 0) this.changerStrategie();	//On check si la stratégie est toujours valable, sinon on change
 		
 		modifierPosition();									//On modifie la position du joueur
-		System.out.println("Joueur n°" + numJoueur + " (Stratégie n°" + numStrat + " : reste " + dureeStrat + " tours) --> Position : " + posJoueur);
+		System.out.println("Joueur n°" + numJoueur + ": (Stratégie n°" + numStrat + " : reste " + dureeStrat + " tours) --> Position : " + posJoueur);
 
 		if(this.estVainqueur()) jeu.finJeu(this);			//On check si le joueur à gagné, si oui on l'indique au jeuSystem.out.println("TEEEEEEST 3");
 	}

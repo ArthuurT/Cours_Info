@@ -26,9 +26,56 @@ DROP SCHEMA public;
 
 5. Creation des tables
 
-Voir Tables dans le .txt (pas eu le temps de les copier)
-
 ```sql
+---- Création d'une énumération de type de jeu
+
+CREATE TYPE mode AS ENUM ('role', 'plateau', 'tower defense', 'MMORPG', 'autre');
+
+---- Emplacement de la création de table JEU
+
+CREATE TABLE jeu(
+	id_jeu serial PRIMARY KEY,
+	nom_jeu varchar(20) NOT NULL,
+	type mode,
+	nb_joueur integer
+);
+
+---- Emplacement de la création de table PARTIE
+
+CREATE TABLE partie(
+	id_avatar serial REFERENCES avatar,
+	id_jeu serial REFERENCES jeu,
+	role varchar(50),
+	highscore bigint,
+	PRIMARY KEY(id_avatar,id_jeu)
+);
+
+---- Emplacement de la création de table SAVE
+
+CREATE TABLE save(
+	id_avatar bigint REFERENCES avatar,
+	id_jeu bigint REFERENCES jeu,
+	date_s date,
+	nb_pv integer,
+	fichier varchar(50) NOT NULL UNIQUE,
+	PRIMARY KEY(id_avatar,id_jeu,date_s)
+);
+
+---- Emplacement de la création de la table VILLE
+
+CREATE TABLE ville(
+	id_ville serial PRIMARY KEY,
+	nom_ville varchar(50) UNIQUE,
+	code_postal integer
+);
+
+INSERT INTO ville VALUES (DEFAULT,'Aix en Provence',13100);
+INSERT INTO ville VALUES (DEFAULT,'Brette les Pins',72250);
+INSERT INTO ville VALUES (DEFAULT,'Foix',09000);
+INSERT INTO ville VALUES (DEFAULT,'Dunkerque',59640);
+INSERT INTO ville VALUES (DEFAULT,'Grenoble',38000);
+INSERT INTO ville VALUES (DEFAULT,'Annecy',74000);
+
 ALTER TABLE visiteur ADD id_ville bigint REFERENCES ville;
 UPDATE visiteur SET id_ville = (SELECT id_ville FROM ville WHERE ville.nom_ville = visiteur.ville);
 ALTER TABLE visiteur DROP COLUMN ville;
