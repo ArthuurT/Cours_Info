@@ -1,0 +1,84 @@
+<html>
+    <head>
+		<title> Exercice 4  JS </title>
+		<meta charset="utf-8">
+    </head>
+
+    <body>
+		<form>
+		  <table id="myForm">
+			 <tr>
+  		      <td align="right">Homme</td>
+  		      <td align="left"><input type="radio" name="gender" value="homme"></td>
+  		    </tr>
+			<tr id = "trNom">
+			 <td align="right">Femme</td>
+			 <td align="left"><input type="radio" name="gender" value="femme"></td>
+		   </tr>
+		    <tr id = "trPrenom">
+		      <td align="right">Nom:</td>
+		      <td align="left"><input id="nom" type="text" name="nom" /></td>
+		    </tr>
+		    <tr id = "trMdp">
+		      <td align="right">Prenom:</td>
+		      <td align="left"><input id="prenom" type="text" name="prenom" /></td>
+		    </tr>
+		    <tr>
+		      <td align="right">Mot de passe:</td>
+		      <td align="left"><input id="mdp" type="text" name="mdp" /></td>
+		    </tr>
+			<tr>
+		      <td align="right">Pays:</td>
+		      <td align="left"><select>
+  						<option value="v1">France</option>
+  						<option value="v2">Espagne</option>
+  						<option value="v3">Allemagne</option>
+  						<option value="v4">Zimbabwe</option>
+  					</select></td>
+		    </tr>
+			<tr>
+		      <td align="right"></td>
+			  <td align="left"><br><input type="submit" name="submit" /></td>
+		    </tr>
+		  </table>
+		</form>
+
+    </body>
+
+	<script>
+
+		document.getElementById("myForm").onsubmit = function(){
+
+			let dNom = document.getElementById("nom")
+			let dPrenom = document.getElementById("prenom")
+			let dMdp = document.getElementById("mdp")
+
+			if(dNom.value.length < 2){
+				let td1 = document.createElement("td")
+				td1.innerHTML = "Un nom ne peut pas faire moins de 2 caractères"
+				document.getElementById("trNom").appendChild(td1)
+			}
+
+			if(dPrenom.value.length < 2){
+				let td2 = document.createElement("td")
+				td2.innerHTML = "Un prenom ne peut pas faire moins de 2 caractères"
+				document.getElementById("trPrenom").appendChild(td2)
+			}
+
+			if(dMdp.value.length < 6){
+				let td3 = document.createElement("td")
+				td3.innerHTML = "Un nom ne peut pas faire moins de 2 caractères"
+				document.getElementById("trMdp").appendChild(td3)
+			}
+		}
+
+
+
+
+	</script>
+
+
+
+
+
+</html>
