@@ -15,6 +15,7 @@ psql --username=u_l3info031 --dbname=bd_l3info031
 ```sql
 ALTER USER u_l3info031 WITH PASSWORD 'WarenAT';
 ```
+
 2.
 ```sql
 CREATE GROUP l3info028_031;
@@ -53,6 +54,7 @@ RAISE NOTICE 'Bonjour %, quelle belle journée n est-ce pas',USER;
 END;
 $$ LANGUAGE plpgsql;
 ```
+
 2.
 ```sql
 CREATE OR REPLACE FUNCTION compar(x int, y int)

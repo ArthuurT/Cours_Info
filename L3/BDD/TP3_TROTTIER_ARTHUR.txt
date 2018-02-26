@@ -1,0 +1,117 @@
+-- TP3 VIDEOCLUB / TROTTIER Arthur
+
+-- Commandes Postgre
+
+CREATE SCHEMA "TP3_Videoclub";
+SET search_path TO "TP3_Videoclub", "u_l3info031";
+
+-- Commandes DDL
+
+ALTER TABLE client ADD statut varchar 
+	DEFAULT 'ok'
+	CHECK (statut IN ('ok','banni','sursis'));
+
+ALTER TABLE emprunt ADD CONSTRAINT check_id_dvd
+		FOREIGN KEY (id_dvd)
+		REFERENCES dvd(id_dvd)
+		ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Commandes SQL
+
+SELECT COUNT(*) FROM
+	(SELECT id_pers FROM acteur 
+		WHERE id_film = (
+			SELECT id_film FROM film WHERE id_genre = (
+				SELECT id_genre from genre WHERE nom_genre = 'Drame'))) AS quelquechose
+	NATURAL JOIN film;
+
+
+CREATE VIEW info_dvd AS 
+	SELECT id_dvd, titre, prenom_pers AS nom_realisateur, nom_genre, id_magasin
+	FROM dvd 
+		NATURAL JOIN personne  
+				NATURAL JOIN film 
+					NATURAL JOIN genre;
+
+
+CREATE FUNCTION nb_emprunt(varchar(20))
+RETURNS bigint
+AS
+'SELECT COUNT(*) FROM film NATURAL JOIN emprunt WHERE titre = $1'
+LANGUAGE SQL;
+
+SELECT titre, count(id_film) AS nb_emprunt
+	FROM emprunt NATURAL JOIN film NATURAL JOIN dvd
+		GROUP BY titre ORDER BY COUNT(id_film);
+
+
+SELECT titre, count(id_film) as nb_emprunt
+	FROM emprunt NATURAL JOIN film NATURAL JOIN dvd
+		GROUP BY titre HAVING COUNT(*) >= ALL(SELECT COUNT(*) FROM emprunt NATURAL JOIN film NATURAL JOIN dvd GROUP BY titre);
+
+
+CREATE OR REPLACE FUNCTION nb_droit_emprunt(idclient bigint)
+	RETURNS integer
+	AS $$
+		DECLARE
+			paye integer;
+		BEGIN
+			SELECT caution FROM client WHERE id_client = idclient INTO paye;
+  			RETURN paye/10;
+		END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION film_dispo(nom varchar, mag bigint)
+	RETURNS setof record
+	AS $$
+		DECLARE
+		BEGIN
+		return query(
+			SELECT titre FROM info_dvd WHERE nom_genre = nom AND id_magasin = mag
+		);
+		END;
+	$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION maj_statut_client(client bigint)
+	RETURNS void
+	AS $$
+		DECLARE
+
+			nb_emprunte_max bigint;
+			nb_emprunte_cur bigint;
+			cur_date date;
+			cur_emprunts CURSOR FOR SELECT * FROM emprunt WHERE id_client = client;
+			emp emprunt%ROWTYPE;
+		BEGIN
+			SELECT DATE(NOW()) INTO cur_date;
+			SELECT COUNT(*) FROM emprunt WHERE id_client = client INTO nb_emprunte_cur;
+			SELECT * FROM nb_droit_emprunt(client) INTO nb_emprunte_max;
+
+			UPDATE client SET statut = 'sursis' 
+				WHERE nb_emprunte_cur > nb_emprunte_max;
+			
+			OPEN cur_emprunts;
+			LOOP
+				FETCH cur_emprunts INTO emp;
+				EXIT WHEN NOT FOUND;
+				raise notice'date de debut: %',emp.date_deb;
+				raise notice'date de fin: %',emp.date_fin;
+				raise notice'diff: %',emp.date_fin - emp.date_deb;
+
+				IF emp.date_fin IS NULL THEN
+					IF emp.date_deb + 3 >= cur_date THEN
+						UPDATE client SET statut = 'sursis' WHERE id_client = client;
+					END IF;
+				ELSE
+					IF emp.date_fin - emp.date_deb > 3 THEN
+						UPDATE client SET statut = 'sursis' WHERE id_client = client;
+					END IF;
+				END IF;
+			END LOOP;
+			CLOSE cur_emprunts;
+		END
+	$$ LANGUAGE plpgsql;
+
+
+
