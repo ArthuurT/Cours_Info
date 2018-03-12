@@ -17,6 +17,10 @@ public class PanelSaisie extends JPanel{
 		this.add(text);
 	}
 
+	public void setText(String txt){
+		text.setText(txt);
+	}
+
 	public String getPText(){
 		return text.getText();
 	}

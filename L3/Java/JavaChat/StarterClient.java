@@ -6,8 +6,9 @@ public class StarterClient{
 		Client c = new Client();
 
 		PressConnexion aLConnexion = new PressConnexion(c);
+		PressEnvoyer aLEnvoi = new PressEnvoyer(c);
 
-		Fenetre f = new Fenetre(c,aLConnexion);
+		Fenetre f = new Fenetre(c,aLConnexion,aLEnvoi);
 		c.addFenetre(f);
 
 	}

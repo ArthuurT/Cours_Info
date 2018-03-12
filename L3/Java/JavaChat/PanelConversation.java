@@ -21,6 +21,9 @@ public class PanelConversation extends JPanel{
 
 	}
 
+	public void addAreaText(String msg){
+		text.append(msg + "\n");
+	}
 
 
 

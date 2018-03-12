@@ -19,6 +19,8 @@ public class PanelConnexion extends JPanel{
 		this.add(ip);
 		this.add(port);
 		connexion.addActionListener(aL);
+		ip.setText("127.0.0.1");
+		port.setText("5896");
 	}
 
 	public PanelSaisie getPPort(){

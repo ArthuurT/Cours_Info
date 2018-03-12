@@ -24,4 +24,9 @@ public class PanelConnected extends JPanel{
 		list.setListData(users.toArray());
 	}
 
+	public void remList(String elem){
+		users.remove(elem);
+		list.setListData(users.toArray());
+	}
+
 }

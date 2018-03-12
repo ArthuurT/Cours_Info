@@ -11,11 +11,14 @@ public class ReponseServeur implements Runnable{
 
    private Socket currentSock;
    private BufferedInputStream reader = null;
-   private List<Socket> lSock = null;
+   private List<Socket> users = null;
+   private List<String> names = null;
    
-   public ReponseServeur(Socket pSock){
+   
+   public ReponseServeur(Socket pSock, List users, List names){
       currentSock = pSock;
-      lSock = new ArrayList<Socket>();
+      this.users = users;
+      this.names = names;
    }
    
    public void run(){
@@ -51,12 +54,14 @@ public class ReponseServeur implements Runnable{
             
 	            switch(cmd.toUpperCase()){
 	               case "ASKCONNECTION":
-	               		lSock.add(currentSock);
-	                  	toSend = "ADDUSER\n" + usr;
+	               		users.add(currentSock);
+	               		names.add(usr);
+	                  	toSend = "ADDUSER\n" + usr + "\n";
+	                  	updateNames(currentSock);
 	                  	break;
 	               case "ASKDECONNECTION":
-	               		lSock.remove(currentSock);
-	                  	toSend = "REMOVEUSER\n" + usr;
+	               		users.remove(currentSock);
+	                  	toSend = "REMOVEUSER\n" + usr + "\n";
 	                  	break;
 	               case "ASKMESSAGE":
 	               		String msg = parts[2];
@@ -66,10 +71,22 @@ public class ReponseServeur implements Runnable{
 	                  	toSend = "Commande inconnu !";                     
 	                  	break;
 	            }
+
+
+	            // On attend 1sec
+
+	            try{
+            		Thread.currentThread().sleep(100);
+         		}catch (InterruptedException e){
+            		e.printStackTrace();
+        		}
 	            
 	            
-	            //On envoie la réponse au client
-	            writerClient(toSend);
+	            //On envoie la réponse aux clients
+
+	            writerClient(toSend,currentSock);
+
+
 	            
 	            if(closeConnexion){
 	               System.err.println("COMMANDE CLOSE DETECTEE ! ");
@@ -98,15 +115,37 @@ public class ReponseServeur implements Runnable{
       return response;
    }
 
-   private void writerClient(String s) throws IOException{
+   private void writerClient(String s, Socket so) throws IOException{
 
-   		Iterator<Socket> it = lSock.iterator();
+   		Iterator<Socket> it = users.iterator();
    		PrintWriter writer = null;
 
    		while(it.hasNext()){
-	   		writer = new PrintWriter(it.next().getOutputStream());
-	   		writer.write(s);
+
+   			Socket curSo = it.next();
+
+   			if(curSo != so){
+		   		writer = new PrintWriter(curSo.getOutputStream());
+		   		writer.write(s);
+			    writer.flush();
+			}
+   		}
+   }
+
+   private void updateNames(Socket s) throws IOException{
+   		Iterator<String> it = names.iterator();
+   		PrintWriter writer = new PrintWriter(s.getOutputStream());
+
+   		while(it.hasNext()){
+	   		writer.write("ADDUSER\n" + it.next());
 		    writer.flush();
+
+		    try{
+            		Thread.currentThread().sleep(100);
+         		}catch (InterruptedException e){
+            		e.printStackTrace();
+        		}
+
    		}
    }
 

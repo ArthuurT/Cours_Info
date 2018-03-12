@@ -5,17 +5,18 @@ public class Fenetre extends JFrame {
 
 	private Client c;
 	private JPanel pc;
-	private JPanel cd = new PanelConnected();
-	private JPanel cv = new PanelConversation();
-	private JPanel sm = new PanelEnvoi();
+	private PanelConnected cd = new PanelConnected();
+	private PanelConversation cv = new PanelConversation();
+	private PanelEnvoi sm;
 
-	public Fenetre(Client c, PressConnexion acB){
+	public Fenetre(Client c, PressConnexion alC, PressEnvoyer alE){
 
 		/* On relie le client à son Interface */
 
 		this.c = c;
 
-		pc = new PanelConnexion(acB);
+		pc = new PanelConnexion(alC);
+		sm = new PanelEnvoi(alE);
 
 		/* Spécificité de la fenêtre */
 
@@ -36,6 +37,26 @@ public class Fenetre extends JFrame {
 
 	}
 
+	public void addUser(String nom){
+		cd.addList(nom);
+	}
+
+	public void remUser(String nom){
+		cd.remList(nom);
+	}
+
+	public void addTxt(String msg){
+		cv.addAreaText(msg);
+	}
+
+	public String getTextEnvoi(){
+		return sm.getAreaText();
+	}
+
+	public void clearTextEnvoi(){
+		sm.clearAreaText();
+	}
+
 	public PanelConnexion getPConnexion(){
 		return (PanelConnexion) pc;
 	}
@@ -51,4 +72,5 @@ public class Fenetre extends JFrame {
 	public String getTextIp(){
 		return getPConnexion().getPIp().getPText();
 	}
+
 }
