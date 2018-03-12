@@ -1,47 +1,46 @@
 <html>
-    <head>
-        <title> Exercice 3  JS </title>
-    </head>
-    
-    <body>
-        <h1> Le site de Denis	</h1>
-		
+	<head>
+		<title> Exercice 3  JS </title>
+	</head>
+
+	<body>
+		<h1> Le site de Denis	</h1>
+
 		<img id= "denis" src="denis.jpg">
-		
+
 		<div>
 			<h2>La zone du bouton</h2>
 			<button type="button" id="theButton">Click me!</button>
-			
+
 			<h2>La zone du bouton couleur</h2>
 			<button type="button" id="theButtonColor">Surprise!</button>
-			
 		</div>
-		
-    </body>
-    
-    <script>
-		
+
+	</body>
+
+	<script>
+
 		window.onload = function(){
 			alert("Bienvenue sur le site");
 		};
-		
+
 		document.getElementById("denis").onmouseover = function(){
 			//alert("Coucou c'est Denis");
 			this.src = "autredenis.png"
 		}
-		
+
 		document.getElementById("denis").onmouseout = function(){
 			this.src = "denis.jpg"
 		}
-	
+
 		document.getElementById("theButton").onclick = function(){
 			alert("Bravo");
 		}
-	
+
 		document.getElementById("theButtonColor").onclick = function(){
 			document.body.style.backgroundColor = "red"
 			this.style.color = "red"
 		}
-	
+
 	</script>
 </html>

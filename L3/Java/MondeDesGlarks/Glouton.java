@@ -12,7 +12,7 @@ public class Glouton extends Glark{
 	}
 
 	public String getMarque(){
-		return "o";
+		return "G";
 	}
 
 	public boolean estBorne(){

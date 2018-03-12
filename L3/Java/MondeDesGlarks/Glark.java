@@ -52,6 +52,13 @@ abstract class Glark {
 		devoreGlark();
 	}
 
+	public String toString(){
+		String s = "";
+		s = s + this.getClass().getSimpleName() + "(" + caseCourante.getx() + "," + caseCourante.gety() + ")";
+		s = s + ": " + getEnergie() + " PV";
+		return s;
+	}
+
 	abstract void devoreGlark();
 
 	abstract Sens trouverDestination();

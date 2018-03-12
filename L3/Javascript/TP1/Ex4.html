@@ -1,84 +1,97 @@
 <html>
-    <head>
-		<title> Exercice 4  JS </title>
+	<head>
+		<title> Exercice 4 JS </title>
 		<meta charset="utf-8">
-    </head>
+		<link rel="stylesheet" href="styleEx4.css" />
+	</head>
 
-    <body>
-		<form>
-		  <table id="myForm">
-			 <tr>
-  		      <td align="right">Homme</td>
-  		      <td align="left"><input type="radio" name="gender" value="homme"></td>
-  		    </tr>
-			<tr id = "trNom">
-			 <td align="right">Femme</td>
-			 <td align="left"><input type="radio" name="gender" value="femme"></td>
-		   </tr>
-		    <tr id = "trPrenom">
-		      <td align="right">Nom:</td>
-		      <td align="left"><input id="nom" type="text" name="nom" /></td>
-		    </tr>
-		    <tr id = "trMdp">
-		      <td align="right">Prenom:</td>
-		      <td align="left"><input id="prenom" type="text" name="prenom" /></td>
-		    </tr>
-		    <tr>
-		      <td align="right">Mot de passe:</td>
-		      <td align="left"><input id="mdp" type="text" name="mdp" /></td>
-		    </tr>
-			<tr>
-		      <td align="right">Pays:</td>
-		      <td align="left"><select>
-  						<option value="v1">France</option>
-  						<option value="v2">Espagne</option>
-  						<option value="v3">Allemagne</option>
-  						<option value="v4">Zimbabwe</option>
-  					</select></td>
-		    </tr>
-			<tr>
-		      <td align="right"></td>
-			  <td align="left"><br><input type="submit" name="submit" /></td>
-		    </tr>
-		  </table>
-		</form>
+	<body>
+			<h1> Formulaire </h1>
 
-    </body>
+			<form id="myForm">
+				<table>
+					<tr>
+						<td align="left">Homme
+							<input id="radioMan" type="radio" name="gender" value="homme"></td>
+						<td align="left">Femme
+							<input id="radioWoman" type="radio" name="gender" value="femme"></td>
+						<td class ="supp" id="tdGender" align"left"></td>
+					</tr>
+					<tr>
+						<td align="left">Nom:</td>
+						<td align="left"><input id="nom" type="text" name="nom" /></td>
+						<td class ="supp" id = "tdNom" align="left"></td>
+					</tr>
+					<tr>
+						<td align="left">Prenom:</td>
+						<td align="left"><input id="prenom" type="text" name="prenom" /></td>
+						<td class ="supp" id = "tdPrenom" align="left"></td>
+					</tr>
+					<tr>
+						<td align="left">Mot de passe:</td>
+						<td align="left"><input id="mdp" type="text" name="mdp" /></td>
+						<td class ="supp" id = "tdMdp" align="left"></td>
+					</tr>
+					<tr>
+						<td align="left">Pays:</td>
+						<td align="left">
+							<select>
+								<option value="v1">France</option>
+								<option value="v2">Espagne</option>
+								<option value="v3">Allemagne</option>
+								<option value="v4">Zimbabwe</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td align="left"></td>
+						<td align="left"><br><input type="submit" name="submit" /></td>
+					</tr>
+				</table>
+			</form>
 
-	<script>
+	</body>
 
-		document.getElementById("myForm").onsubmit = function(){
+		<script>
 
-			let dNom = document.getElementById("nom")
-			let dPrenom = document.getElementById("prenom")
-			let dMdp = document.getElementById("mdp")
+			document.getElementsByClassName("radioMan").checked = false
+			document.getElementsByClassName("radioWoman").checked = false
 
-			if(dNom.value.length < 2){
-				let td1 = document.createElement("td")
-				td1.innerHTML = "Un nom ne peut pas faire moins de 2 caractères"
-				document.getElementById("trNom").appendChild(td1)
+			document.getElementById("myForm").onsubmit = function(){
+
+				let marq = 0
+				let dNom = document.getElementById("nom").value
+				let dPrenom = document.getElementById("prenom").value
+				let dMdp = document.getElementById("mdp").value
+
+				if(dNom.length < 2){
+					marq = 1
+					let d1 = document.getElementById("tdNom")
+					d1.innerHTML = " <- Un nom ne peut pas faire moins de 2 caractères"
+				}
+
+				if(dPrenom.length < 2){
+					marq = 1
+					let d2 = document.getElementById("tdPrenom")
+					d2.innerHTML = " <- Un prenom ne peut pas faire moins de 2 caractères"
+				}
+
+				if(dMdp.length <= 6){
+					marq = 1
+					let d3 = document.getElementById("tdMdp")
+					d3.innerHTML = " <- Un mot de passe ne peut pas faire moins de 6 caractères"
+				}
+
+				if(!document.getElementById("radioMan").checked && !document.getElementById("radioWoman").checked){
+					marq = 1
+					let d4 = document.getElementById("tdGender")
+					d4.innerHTML = " <- Veuillez choisir un genre"
+				}
+
+				if(marq == 1) return false
+				else return true
 			}
 
-			if(dPrenom.value.length < 2){
-				let td2 = document.createElement("td")
-				td2.innerHTML = "Un prenom ne peut pas faire moins de 2 caractères"
-				document.getElementById("trPrenom").appendChild(td2)
-			}
-
-			if(dMdp.value.length < 6){
-				let td3 = document.createElement("td")
-				td3.innerHTML = "Un nom ne peut pas faire moins de 2 caractères"
-				document.getElementById("trMdp").appendChild(td3)
-			}
-		}
-
-
-
-
-	</script>
-
-
-
-
+		</script>
 
 </html>

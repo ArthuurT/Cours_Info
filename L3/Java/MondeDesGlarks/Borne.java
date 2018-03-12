@@ -24,7 +24,7 @@ public class Borne extends Glark{
 	}
 
 	public String getMarque(){
-		return ">";
+		return "B";
 	}
 
 	public boolean estBorne(){

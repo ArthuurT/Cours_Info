@@ -14,7 +14,7 @@ public class Pirate extends Glark{
 	}
 
 	public String getMarque(){
-		return "π";
+		return "P";
 	}
 
 	public boolean estBorne(){

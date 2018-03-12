@@ -17,12 +17,8 @@ public class Jeu{
 	public Jeu(){
 		plateau = new Damier(9,9,this);
 		listeGlark = new ArrayList<Glark>();
-	}
 
-	public void start() throws InterruptedException{
-
-		// Cases obstacle (contour)
-
+		
 		int i;
 		int j = 0;
 		int k = 0;
@@ -87,13 +83,34 @@ public class Jeu{
 		listeGlark.add(new Borne((CaseLibre)plateau.getCase(5,3)));
 		listeGlark.add(new Borne((CaseLibre)plateau.getCase(7,2)));
 		listeGlark.add(new Borne((CaseLibre)plateau.getCase(7,7)));
+	}
 
+	public Damier getPlateau(){
+		return plateau;
+	}
+
+	private void etatAfficher(){
+		Iterator<Glark> itEtat = listeGlark.iterator();
+
+		System.out.println("\nEtat de la partie: \n");
+
+		while(itEtat.hasNext()){
+			Glark glarkCourant = itEtat.next();
+			System.out.println(glarkCourant.toString());
+		}
 		
+	}
+
+	public void start() throws InterruptedException{
+
+		// Cases obstacle (contour)
+
 
 		try        
 		{
 			clrscr();
 			plateau.afficher();
+			etatAfficher();
 
 			while(!listeGlark.isEmpty()){
 				it = listeGlark.iterator();
@@ -110,11 +127,13 @@ public class Jeu{
 						Thread.sleep(500);
 						clrscr();
 						plateau.afficher();
+						etatAfficher();
 					}
 				}
 			}
 			clrscr();
 			plateau.afficher();
+			etatAfficher();
 		} 
 		catch(InterruptedException ex) 
 		{

@@ -59,7 +59,7 @@ public class Panneau extends JPanel {
 
     //.setColor(Color.red);
     //g.setFont(font);
-
+*/
     try{
       Image img = ImageIO.read(new File("image.jpg"));
       //g.drawImage(img, 0, 0, this);
@@ -69,7 +69,7 @@ public class Panneau extends JPanel {
     }catch (IOException e){
       e.printStackTrace();
     }
-
+/*
     g.fillOval(x1,y1,h1,l1);
     g.drawOval(x1,y1,h1,l1);
     g.drawRect(x1,y1,h1,l1);

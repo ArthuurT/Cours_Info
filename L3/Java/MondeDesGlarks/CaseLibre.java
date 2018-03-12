@@ -18,7 +18,7 @@ public class CaseLibre extends Case{
 		plateau = unDamier;
 		boolean blurf = unBlurf;
 		listGlark = new ArrayList<Glark>();
-		marque = "-";
+		marque = " ";
 	}
 
 	public Iterator<Glark> menu(){
@@ -27,12 +27,16 @@ public class CaseLibre extends Case{
 
 	public String getMarque(){
 		if(!listGlark.isEmpty()) return listGlark.get(0).getMarque();
-		else if(blurf) return "%";
+		else if(blurf) return "ø";
 		else return marque;
 	}
 
 	public boolean getBlurf(){
 		return blurf;
+	}
+
+	public Glark getFirstGlark(){
+		return listGlark.get(0);
 	}
 
 	public Damier getPlateau(){

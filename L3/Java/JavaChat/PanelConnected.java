@@ -2,17 +2,19 @@ import java.awt.*;
 import javax.swing.*;
 import java.util.*;
 
-public class Connected extends JPanel{
+public class PanelConnected extends JPanel{
 
 	private java.util.List<String> users = new ArrayList<String>();
 	private JLabel label = new JLabel("Connectés");
 	private JList list = new JList(users.toArray());
 
-	public Connected(){
+	public PanelConnected(){
 		JPanel content = new JPanel();
+		label.setAlignmentX(CENTER_ALIGNMENT);
+		list.setBorder(BorderFactory.createLineBorder(Color.black));
 		content.add(list);
 		this.setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
-		list.setPreferredSize(new Dimension(150,400));
+		list.setPreferredSize(new Dimension(150,350));
 		this.add(label);
 		this.add(content);
 	}
